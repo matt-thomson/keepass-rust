@@ -35,7 +35,7 @@ mod tests {
     use byteorder::{LittleEndian, WriteBytesExt};
 
     #[test]
-    pub fn should_return_file_() {
+    pub fn should_return_file_type() {
         let mut bytes = vec![];
         bytes.write_u32::<LittleEndian>(super::SIGNATURE_FILE).unwrap();
         bytes.write_u32::<LittleEndian>(super::SIGNATURE_KEEPASS2).unwrap();

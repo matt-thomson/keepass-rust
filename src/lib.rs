@@ -35,3 +35,27 @@ pub fn read(path: &str) -> Result<FileType, Error> {
 fn read_u32(reader: &mut io::Read) -> Result<u32, Error> {
     reader.read_u32::<LittleEndian>().map_err(|e| Error::ByteOrder(e))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Error;
+
+    #[test]
+    pub fn should_read_u32() {
+        let bytes = vec![10, 20, 30, 40];
+        let result = super::read_u32(&mut &bytes[..]).unwrap();
+
+        assert_eq!(result, 0x281E140A);
+    }
+
+    #[test]
+    pub fn should_return_error_if_u32_can_not_be_read() {
+        let bytes = vec![10, 20, 30];
+        let result = super::read_u32(&mut &bytes[..]);
+
+        match result {
+            Err(Error::ByteOrder(_)) => (),
+            _ => panic!("Invalid result: {:#?}", result)
+        }
+    }
+}
