@@ -26,3 +26,52 @@ fn match_file_type(sig: u32) -> Result<FileType, Error> {
             _ => Err(Error::InvalidFileType)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use super::super::{Error, FileType};
+
+    use byteorder::{LittleEndian, WriteBytesExt};
+
+    #[test]
+    pub fn should_return_file_() {
+        let mut bytes = vec![];
+        bytes.write_u32::<LittleEndian>(super::SIGNATURE_FILE).unwrap();
+        bytes.write_u32::<LittleEndian>(super::SIGNATURE_KEEPASS2).unwrap();
+
+        let result = get_file_type(&mut &bytes[..]);
+
+        match result {
+            Ok(FileType::KeePass2) => (),
+            _ => panic!("Invalid result: {:#?}", result)
+        }
+    }
+
+    #[test]
+    pub fn should_return_error_if_wrong_signature() {
+        let mut bytes = vec![];
+        bytes.write_u32::<LittleEndian>(super::SIGNATURE_FILE + 1).unwrap();
+
+        let result = get_file_type(&mut &bytes[..]);
+
+        match result {
+            Err(Error::InvalidSignature) => (),
+            _ => panic!("Invalid result: {:#?}", result)
+        }
+    }
+
+    #[test]
+    pub fn should_return_error_if_invalid_type() {
+        let mut bytes = vec![];
+        bytes.write_u32::<LittleEndian>(super::SIGNATURE_FILE).unwrap();
+        bytes.write_u32::<LittleEndian>(super::SIGNATURE_KEEPASS2 + 1).unwrap();
+
+        let result = get_file_type(&mut &bytes[..]);
+
+        match result {
+            Err(Error::InvalidFileType) => (),
+            _ => panic!("Invalid result: {:#?}", result)
+        }
+    }
+}

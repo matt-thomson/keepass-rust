@@ -16,7 +16,7 @@ pub enum Error {
     InvalidFileType
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub enum FileType {
     KeePass1,
     KeePass2PreRelease,
@@ -39,5 +39,9 @@ fn read_u32(reader: &mut io::Read) -> Result<u32, Error> {
 #[test]
 fn should_read_database() {
     let result = read("data/test.kdbx").unwrap();
-    assert_eq!(result, FileType::KeePass2);
+
+    match result {
+        FileType::KeePass2 => (),
+        _ => panic!("Invalid result: {:#?}", result)
+    }
 }
