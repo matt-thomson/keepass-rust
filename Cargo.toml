@@ -1,4 +1,8 @@
 [package]
-name = "keepass-rust"
+name = "keepass"
 version = "0.0.1"
 authors = ["Matt Thomson <mattjohnthomson@gmail.com>"]
+
+[dependencies]
+
+byteorder = "*"
