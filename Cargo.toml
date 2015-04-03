@@ -1,0 +1,4 @@
+[package]
+name = "keepass-rust"
+version = "0.0.1"
+authors = ["Matt Thomson <mattjohnthomson@gmail.com>"]
