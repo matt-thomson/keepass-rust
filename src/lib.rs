@@ -35,13 +35,3 @@ pub fn read(path: &str) -> Result<FileType, Error> {
 fn read_u32(reader: &mut io::Read) -> Result<u32, Error> {
     reader.read_u32::<LittleEndian>().map_err(|e| Error::ByteOrder(e))
 }
-
-#[test]
-fn should_read_database() {
-    let result = read("data/test.kdbx").unwrap();
-
-    match result {
-        FileType::KeePass2 => (),
-        _ => panic!("Invalid result: {:#?}", result)
-    }
-}
