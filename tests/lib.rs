@@ -4,5 +4,5 @@ extern crate keepass;
 fn should_read_database() {
     let result = keepass::read("data/test.kdbx").unwrap();
 
-    assert_eq!(result.version, 0);
+    assert_eq!(result.version, 0x00030001);
 }
