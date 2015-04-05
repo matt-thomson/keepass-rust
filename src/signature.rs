@@ -1,5 +1,5 @@
-use super::read;
-use super::{Error, FileType};
+use read;
+use {Error, FileType};
 
 use std::io::Read;
 
@@ -29,9 +29,9 @@ fn match_file_type(file_type: u32) -> Result<FileType, Error> {
 }
 
 #[cfg(test)]
-mod tests {
+mod test {
     use super::*;
-    use super::super::{Error, FileType};
+    use {Error, FileType};
 
     use byteorder::{LittleEndian, WriteBytesExt};
 

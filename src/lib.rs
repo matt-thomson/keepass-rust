@@ -15,7 +15,11 @@ pub enum Error {
     InvalidSignature(u32),
     InvalidFileType(u32),
     UnsupportedFileType(FileType),
-    UnknownTlv(u8)
+    UnknownTlv(u8),
+    InvalidTlvSize,
+
+    UnknownCompressionType(u32),
+    UnknownCipherType(u64, u64)
 }
 
 #[derive(Debug)]
