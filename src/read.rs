@@ -1,19 +1,27 @@
-use super::{Error};
+use super::Error;
 
+use byteorder;
 use byteorder::{LittleEndian, ReadBytesExt};
 
 use std::io::Read;
 
 pub fn read_u8(reader: &mut Read) -> Result<u8, Error> {
-    reader.read_u8().map_err(|e| Error::ByteOrder(e))
+    reader.read_u8().map_err(handle_error)
 }
 
 pub fn read_u16(reader: &mut Read) -> Result<u16, Error> {
-    reader.read_u16::<LittleEndian>().map_err(|e| Error::ByteOrder(e))
+    reader.read_u16::<LittleEndian>().map_err(handle_error)
 }
 
 pub fn read_u32(reader: &mut Read) -> Result<u32, Error> {
-    reader.read_u32::<LittleEndian>().map_err(|e| Error::ByteOrder(e))
+    reader.read_u32::<LittleEndian>().map_err(handle_error)
+}
+
+fn handle_error(err: byteorder::Error) -> Error {
+    match err {
+        byteorder::Error::UnexpectedEOF => Error::UnexpectedEOF,
+        byteorder::Error::Io(e) => Error::Io(e)
+    }
 }
 
 #[cfg(test)]
@@ -34,7 +42,7 @@ mod tests {
         let result = super::read_u8(&mut &bytes[..]);
 
         match result {
-            Err(Error::ByteOrder(_)) => (),
+            Err(Error::UnexpectedEOF) => (),
             _ => panic!("Invalid result: {:#?}", result)
         }
     }
@@ -53,7 +61,7 @@ mod tests {
         let result = super::read_u16(&mut &bytes[..]);
 
         match result {
-            Err(Error::ByteOrder(_)) => (),
+            Err(Error::UnexpectedEOF) => (),
             _ => panic!("Invalid result: {:#?}", result)
         }
     }
@@ -72,7 +80,7 @@ mod tests {
         let result = super::read_u32(&mut &bytes[..]);
 
         match result {
-            Err(Error::ByteOrder(_)) => (),
+            Err(Error::UnexpectedEOF) => (),
             _ => panic!("Invalid result: {:#?}", result)
         }
     }

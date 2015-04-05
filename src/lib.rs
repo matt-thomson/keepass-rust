@@ -9,7 +9,7 @@ use std::io;
 
 #[derive(Debug)]
 pub enum Error {
-    ByteOrder(byteorder::Error),
+    UnexpectedEOF,
     Io(io::Error),
 
     InvalidSignature(u32),

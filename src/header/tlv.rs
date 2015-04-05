@@ -44,11 +44,13 @@ fn read_type_length(reader: &mut Read) -> Result<(u8, u16), Error> {
 fn read_tlv(reader: &mut Read, tlv_type: u8, length: u16) -> Result<Tlv, Error> {
     let mut value = vec![];
 
-    for _ in 0..length {
-        value.push(read::read_u8(reader).unwrap());
-    }
-
-    Ok(Tlv { tlv_type: tlv_type, value: value})
+    reader.take(length as u64).read_to_end(&mut value)
+        .map_err(|e| Error::Io(e))
+        .and_then(|bytes_read| if bytes_read as u16 == length {
+            Ok(Tlv { tlv_type: tlv_type, value: value })
+        } else {
+            Err(Error::UnexpectedEOF)
+        })
 }
 
 #[cfg(test)]
@@ -76,13 +78,17 @@ mod tests {
         bytes.write_u16::<LittleEndian>(4).unwrap();
         bytes.write(&vec![1, 2, 3, 4]).unwrap();
 
+        bytes.write_u8(3).unwrap();
+        bytes.write_u16::<LittleEndian>(2).unwrap();
+        bytes.write(&vec![5, 6]).unwrap();
+
         bytes.write_u8(0).unwrap();
         bytes.write_u16::<LittleEndian>(0).unwrap();
 
         let reader = &mut &bytes[..];
 
         let mut tlvs = super::tlvs(reader).collect::<Vec<_>>();
-        assert_eq!(tlvs.len(), 1);
+        assert_eq!(tlvs.len(), 2);
 
         let ref mut tlv = tlvs.as_mut()[0].as_mut().ok().unwrap();
         assert_eq!(tlv.tlv_type, 2);
