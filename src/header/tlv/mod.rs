@@ -4,10 +4,9 @@ mod compression;
 use read;
 use Error;
 
-use std::io::Read;
+use header::{CipherType, CompressionType};
 
-use self::cipher::CipherType;
-use self::compression::CompressionType;
+use std::io::Read;
 
 #[derive(Debug)]
 pub enum Tlv {
@@ -69,8 +68,7 @@ fn check_tlv_length(length: u16, expected: u16) -> Result<(), Error> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use super::cipher::CipherType;
-    use super::compression::CompressionType;
+    use header::{CipherType, CompressionType};
 
     use std::io::Write;
 

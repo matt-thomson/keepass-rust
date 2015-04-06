@@ -1,17 +1,13 @@
 use read;
 use Error;
 
-use super::Tlv;
+use header::CipherType;
+use header::tlv::Tlv;
 
 use std::io::Read;
 
 const AES_UUID_1: u64 = 0x504371BFE6F2C131;
 const AES_UUID_2: u64 = 0xFF5AFC6A210558BE;
-
-#[derive(Debug)]
-pub enum CipherType {
-    Aes
-}
 
 pub fn read_cipher_type(reader: &mut Read, length: u16) -> Result<Tlv, Error> {
     super::check_tlv_length(length, 16)
@@ -31,7 +27,9 @@ fn match_cipher_type(uuid1: u64, uuid2: u64) -> Result<CipherType, Error> {
 #[cfg(test)]
 mod test {
     use super::*;
+
     use Error;
+    use header::CipherType;
     use header::tlv::Tlv;
 
     use byteorder::{LittleEndian, WriteBytesExt};

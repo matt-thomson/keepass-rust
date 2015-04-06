@@ -1,6 +1,6 @@
 extern crate byteorder;
 
-mod header;
+pub mod header;
 mod read;
 mod signature;
 
@@ -18,8 +18,11 @@ pub enum Error {
     UnknownTlv(u8),
     InvalidTlvSize,
 
+    UnknownCipherType(u64, u64),
     UnknownCompressionType(u32),
-    UnknownCipherType(u64, u64)
+
+    MissingCompressionType,
+    MissingCipherType
 }
 
 #[derive(Debug)]

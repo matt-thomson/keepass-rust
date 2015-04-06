@@ -1,19 +1,35 @@
+mod builder;
 mod tlv;
 
 use read;
 use {Error, FileType};
 
+use self::builder::HeaderBuilder;
+
 use std::io::Read;
+
+#[derive(Debug, PartialEq)]
+pub enum CipherType {
+    Aes
+}
+
+#[derive(Debug, PartialEq)]
+pub enum CompressionType {
+    None,
+    Gzip
+}
 
 #[derive(Debug)]
 pub struct Header {
-    pub version: u32
+    pub version: u32,
+    pub cipher: CipherType,
+    pub compression: CompressionType
 }
 
 pub fn read_header(file_type: FileType, reader: &mut Read) -> Result<Header, Error> {
     check_file_type(file_type)
         .and_then(|_| read_version(reader))
-        .and_then(|header| handle_tlvs(reader, header))
+        .and_then(|version| handle_tlvs(reader, version))
 }
 
 fn check_file_type(file_type: FileType) -> Result<(), Error> {
@@ -23,16 +39,21 @@ fn check_file_type(file_type: FileType) -> Result<(), Error> {
     }
 }
 
-fn read_version(reader: &mut Read) -> Result<Header, Error> {
-    read::read_u32(reader).map(|version| Header { version: version })
+fn read_version(reader: &mut Read) -> Result<u32, Error> {
+    read::read_u32(reader)
 }
 
-fn handle_tlvs(reader: &mut Read, header: Header) -> Result<Header, Error> {
+fn handle_tlvs(reader: &mut Read, version: u32) -> Result<Header, Error> {
+    let mut builder = HeaderBuilder::new(version);
+
     for tlv in tlv::tlvs(reader) {
-        println!("{:#?}", tlv);
+        match tlv {
+            Ok(t) => builder.apply(t),
+            Err(e) => return Err(e)
+        }
     }
 
-    Ok(header)
+    builder.build()
 }
 
 #[cfg(test)]

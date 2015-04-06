@@ -1,15 +1,10 @@
 use read;
 use Error;
 
-use super::Tlv;
+use header::CompressionType;
+use header::tlv::Tlv;
 
 use std::io::Read;
-
-#[derive(Debug)]
-pub enum CompressionType {
-    None,
-    Gzip
-}
 
 pub fn read_compression_flags(reader: &mut Read, length: u16) -> Result<Tlv, Error> {
     super::check_tlv_length(length, 4)
@@ -29,7 +24,9 @@ fn match_compression_flags(flags: u32) -> Result<CompressionType, Error> {
 #[cfg(test)]
 mod test {
     use super::*;
+
     use Error;
+    use header::CompressionType;
     use header::tlv::Tlv;
 
     use byteorder::{LittleEndian, WriteBytesExt};
