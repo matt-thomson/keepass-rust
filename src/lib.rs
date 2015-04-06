@@ -1,5 +1,7 @@
 extern crate byteorder;
 
+#[macro_use] mod macros;
+
 pub mod header;
 mod read;
 mod signature;
