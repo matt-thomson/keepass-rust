@@ -14,12 +14,12 @@ pub fn read_encryption_iv(reader: &mut Read, length: u16) -> Result<Tlv, Error> 
         .map(|iv| Tlv::EncryptionIv(iv))
 }
 
-fn read_iv(reader: &mut Read) -> Result<Vec<u8>, Error> {
+fn read_iv(reader: &mut Read) -> Result<[u8; 16], Error> {
     let mut buf = [0; IV_LENGTH];
     reader.read(&mut buf)
         .map_err(|e| Error::Io(e))
         .and_then(check_bytes_read)
-        .map(|_| buf.to_vec())
+        .map(|_| buf)
 }
 
 fn check_bytes_read(bytes_read: usize) -> Result<(), Error> {
@@ -35,7 +35,7 @@ mod test {
 
     #[test]
     fn should_read_encryption_iv() {
-        let iv = (0..16).collect::<Vec<_>>();
+        let iv = [1; 16];
         let bytes = iv.clone();
 
         let result = read_encryption_iv(&mut &bytes[..], 16);
@@ -60,7 +60,7 @@ mod test {
 
     #[test]
     fn should_return_error_if_wrong_number_of_bytes_read() {
-        let iv = (0..15).collect::<Vec<_>>();
+        let iv = [1; 15];
         let bytes = iv.clone();
 
         let result = read_encryption_iv(&mut &bytes[..], 16);

@@ -14,7 +14,7 @@ pub enum Tlv {
     EndOfHeader,
     Cipher(CipherType),
     Compression(CompressionType),
-    EncryptionIv(Vec<u8>)
+    EncryptionIv([u8; 16])
 }
 
 pub struct HeaderReader<'a> {

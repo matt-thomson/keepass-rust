@@ -7,7 +7,7 @@ pub struct HeaderBuilder {
     version: u32,
     cipher: Option<CipherType>,
     compression: Option<CompressionType>,
-    encryption_iv: Option<Vec<u8>>
+    encryption_iv: Option<[u8; 16]>
 }
 
 impl HeaderBuilder {
@@ -55,12 +55,12 @@ mod test {
     #[test]
     pub fn should_build_header() {
         let version = 0x01020304;
-        let iv = (0..16).collect::<Vec<_>>();
+        let iv = [1; 16];
 
         let mut builder = HeaderBuilder::new(version);
         builder.apply(Tlv::Cipher(CipherType::Aes));
         builder.apply(Tlv::Compression(CompressionType::Gzip));
-        builder.apply(Tlv::EncryptionIv(iv.clone()));
+        builder.apply(Tlv::EncryptionIv(iv));
 
         let result = builder.build().unwrap();
 

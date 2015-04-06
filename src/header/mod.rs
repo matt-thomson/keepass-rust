@@ -24,7 +24,7 @@ pub struct Header {
     pub version: u32,
     pub cipher: CipherType,
     pub compression: CompressionType,
-    pub encryption_iv: Vec<u8>
+    pub encryption_iv: [u8; 16]
 }
 
 pub fn read_header(file_type: FileType, reader: &mut Read) -> Result<Header, Error> {
