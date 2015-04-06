@@ -6,7 +6,8 @@ use Error;
 pub struct HeaderBuilder {
     version: u32,
     cipher: Option<CipherType>,
-    compression: Option<CompressionType>
+    compression: Option<CompressionType>,
+    encryption_iv: Option<Vec<u8>>
 }
 
 impl HeaderBuilder {
@@ -14,7 +15,8 @@ impl HeaderBuilder {
         HeaderBuilder {
             version: version,
             cipher: None,
-            compression: None
+            compression: None,
+            encryption_iv: None
         }
     }
 
@@ -22,18 +24,21 @@ impl HeaderBuilder {
         match tlv {
             Tlv::EndOfHeader => unreachable!(),
             Tlv::Cipher(cipher) => self.cipher = Some(cipher),
-            Tlv::Compression(compression) => self.compression = Some(compression)
+            Tlv::Compression(compression) => self.compression = Some(compression),
+            Tlv::EncryptionIv(iv) => self.encryption_iv = Some(iv)
         }
     }
 
     pub fn build(self) -> Result<Header, Error> {
-        match (self.cipher, self.compression) {
-            (None, _) => Err(Error::MissingCipherType),
-            (_, None) => Err(Error::MissingCompressionType),
-            (Some(cipher), Some(compression)) => Ok(Header {
+        match (self.cipher, self.compression, self.encryption_iv) {
+            (None, _, _) => Err(Error::MissingCipherType),
+            (_, None, _) => Err(Error::MissingCompressionType),
+            (_, _, None) => Err(Error::MissingEncryptionIv),
+            (Some(cipher), Some(compression), Some(iv)) => Ok(Header {
                 version: self.version,
                 cipher: cipher,
-                compression: compression
+                compression: compression,
+                encryption_iv: iv
             })
         }
     }
@@ -50,16 +55,19 @@ mod test {
     #[test]
     pub fn should_build_header() {
         let version = 0x01020304;
+        let iv = (0..16).collect::<Vec<_>>();
 
         let mut builder = HeaderBuilder::new(version);
         builder.apply(Tlv::Cipher(CipherType::Aes));
         builder.apply(Tlv::Compression(CompressionType::Gzip));
+        builder.apply(Tlv::EncryptionIv(iv.clone()));
 
         let result = builder.build().unwrap();
 
         assert_eq!(result.version, version);
         assert_eq!(result.cipher, CipherType::Aes);
-        assert_eq!(result.compression, CompressionType::Gzip)
+        assert_eq!(result.compression, CompressionType::Gzip);
+        assert_eq!(result.encryption_iv, iv);
     }
 
     #[test]
@@ -86,6 +94,22 @@ mod test {
 
         match result {
             Err(Error::MissingCompressionType) => (),
+            _ => panic!("Invalid result: {:#?}", result)
+        }
+    }
+
+    #[test]
+    pub fn should_return_error_if_no_encryption_iv() {
+        let version = 0x01020304;
+
+        let mut builder = HeaderBuilder::new(version);
+        builder.apply(Tlv::Cipher(CipherType::Aes));
+        builder.apply(Tlv::Compression(CompressionType::Gzip));
+
+        let result = builder.build();
+
+        match result {
+            Err(Error::MissingEncryptionIv) => (),
             _ => panic!("Invalid result: {:#?}", result)
         }
     }

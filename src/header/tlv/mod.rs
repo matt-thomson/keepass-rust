@@ -1,5 +1,6 @@
 mod cipher;
 mod compression;
+mod iv;
 
 use read;
 use Error;
@@ -12,7 +13,8 @@ use std::io::Read;
 pub enum Tlv {
     EndOfHeader,
     Cipher(CipherType),
-    Compression(CompressionType)
+    Compression(CompressionType),
+    EncryptionIv(Vec<u8>)
 }
 
 pub struct HeaderReader<'a> {
@@ -57,6 +59,7 @@ fn read_tlv(reader: &mut Read, tlv_type: u8, length: u16) -> Result<Tlv, Error> 
         0 => Ok(Tlv::EndOfHeader),
         2 => cipher::read_cipher_type(reader, length),
         3 => compression::read_compression_flags(reader, length),
+        4 => iv::read_encryption_iv(reader, length),
         _ => Err(Error::UnknownTlv(tlv_type))
     }
 }

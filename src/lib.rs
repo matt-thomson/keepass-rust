@@ -22,7 +22,8 @@ pub enum Error {
     UnknownCompressionType(u32),
 
     MissingCompressionType,
-    MissingCipherType
+    MissingCipherType,
+    MissingEncryptionIv
 }
 
 #[derive(Debug)]
