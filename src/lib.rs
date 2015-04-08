@@ -27,6 +27,7 @@ pub enum Error {
     MissingCipherType,
     MissingMasterSeed,
     MissingTransformSeed,
+    MissingTransformRounds,
     MissingEncryptionIv
 }
 

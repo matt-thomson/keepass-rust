@@ -2,6 +2,7 @@ mod cipher;
 mod compression;
 mod iv;
 mod master_seed;
+mod transform_rounds;
 mod transform_seed;
 
 use read;
@@ -18,6 +19,7 @@ pub enum Tlv {
     Compression(CompressionType),
     MasterSeed([u8; 32]),
     TransformSeed([u8; 32]),
+    TransformRounds(u64),
     EncryptionIv([u8; 16])
 }
 
@@ -59,6 +61,7 @@ fn read_tlv(reader: &mut Read, tlv_type: u8, length: u16) -> Result<Tlv, Error> 
         3 => compression::read_compression_flags(reader, length),
         4 => master_seed::read_master_seed(reader, length),
         5 => transform_seed::read_transform_seed(reader, length),
+        6 => transform_rounds::read_transform_rounds(reader, length),
         7 => iv::read_encryption_iv(reader, length),
         _ => Err(Error::UnknownTlv(tlv_type))
     }

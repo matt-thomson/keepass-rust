@@ -9,6 +9,7 @@ pub struct HeaderBuilder {
     compression: Option<CompressionType>,
     master_seed: Option<[u8; 32]>,
     transform_seed: Option<[u8; 32]>,
+    transform_rounds: Option<u64>,
     encryption_iv: Option<[u8; 16]>
 }
 
@@ -20,6 +21,7 @@ impl HeaderBuilder {
             compression: None,
             master_seed: None,
             transform_seed: None,
+            transform_rounds: None,
             encryption_iv: None
         }
     }
@@ -31,6 +33,7 @@ impl HeaderBuilder {
             Tlv::Compression(compression) => self.compression = Some(compression),
             Tlv::MasterSeed(seed) => self.master_seed = Some(seed),
             Tlv::TransformSeed(seed) => self.transform_seed = Some(seed),
+            Tlv::TransformRounds(rounds) => self.transform_rounds = Some(rounds),
             Tlv::EncryptionIv(iv) => self.encryption_iv = Some(iv)
         }
     }
@@ -40,6 +43,7 @@ impl HeaderBuilder {
         else if self.compression.is_none() { Err(Error::MissingCompressionType) }
         else if self.master_seed.is_none() { Err(Error::MissingMasterSeed) }
         else if self.transform_seed.is_none() { Err(Error::MissingTransformSeed) }
+        else if self.transform_rounds.is_none() { Err(Error::MissingTransformRounds) }
         else if self.encryption_iv.is_none() { Err(Error::MissingEncryptionIv) }
         else {
             Ok(Header {
@@ -48,6 +52,7 @@ impl HeaderBuilder {
                 compression: self.compression.unwrap(),
                 master_seed: self.master_seed.unwrap(),
                 transform_seed: self.transform_seed.unwrap(),
+                transform_rounds: self.transform_rounds.unwrap(),
                 encryption_iv: self.encryption_iv.unwrap()
             })
         }
@@ -67,6 +72,7 @@ mod test {
         let version = 0x01020304;
         let master_seed = [1; 32];
         let transform_seed = [2; 32];
+        let transform_rounds = 10000;
         let iv = [3; 16];
 
         let mut builder = HeaderBuilder::new(version);
@@ -74,6 +80,7 @@ mod test {
         builder.apply(Tlv::Compression(CompressionType::Gzip));
         builder.apply(Tlv::MasterSeed(master_seed));
         builder.apply(Tlv::TransformSeed(transform_seed));
+        builder.apply(Tlv::TransformRounds(transform_rounds));
         builder.apply(Tlv::EncryptionIv(iv));
 
         let result = builder.build().unwrap();
@@ -83,6 +90,7 @@ mod test {
         assert_eq!(result.compression, CompressionType::Gzip);
         assert_eq!(result.master_seed, master_seed);
         assert_eq!(result.transform_seed, transform_seed);
+        assert_eq!(result.transform_rounds, 10000);
         assert_eq!(result.encryption_iv, iv);
     }
 
@@ -149,7 +157,7 @@ mod test {
     }
 
     #[test]
-    pub fn should_return_error_if_no_encryption_iv() {
+    pub fn should_return_error_if_no_transform_rounds() {
         let version = 0x01020304;
         let master_seed = [1; 32];
         let transform_seed = [2; 32];
@@ -159,6 +167,28 @@ mod test {
         builder.apply(Tlv::Compression(CompressionType::Gzip));
         builder.apply(Tlv::MasterSeed(master_seed));
         builder.apply(Tlv::TransformSeed(transform_seed));
+
+        let result = builder.build();
+
+        match result {
+            Err(Error::MissingTransformRounds) => (),
+            _ => panic!("Invalid result: {:#?}", result)
+        }
+    }
+
+    #[test]
+    pub fn should_return_error_if_no_encryption_iv() {
+        let version = 0x01020304;
+        let master_seed = [1; 32];
+        let transform_seed = [2; 32];
+        let transform_rounds = 10000;
+
+        let mut builder = HeaderBuilder::new(version);
+        builder.apply(Tlv::Cipher(CipherType::Aes));
+        builder.apply(Tlv::Compression(CompressionType::Gzip));
+        builder.apply(Tlv::MasterSeed(master_seed));
+        builder.apply(Tlv::TransformSeed(transform_seed));
+        builder.apply(Tlv::TransformRounds(transform_rounds));
 
         let result = builder.build();
 

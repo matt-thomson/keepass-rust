@@ -26,6 +26,7 @@ pub struct Header {
     pub compression: CompressionType,
     pub master_seed: [u8; 32],
     pub transform_seed: [u8; 32],
+    pub transform_rounds: u64,
     pub encryption_iv: [u8; 16]
 }
 
