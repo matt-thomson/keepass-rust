@@ -25,6 +25,7 @@ pub struct Header {
     pub cipher: CipherType,
     pub compression: CompressionType,
     pub master_seed: [u8; 32],
+    pub transform_seed: [u8; 32],
     pub encryption_iv: [u8; 16]
 }
 

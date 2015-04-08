@@ -8,6 +8,7 @@ pub struct HeaderBuilder {
     cipher: Option<CipherType>,
     compression: Option<CompressionType>,
     master_seed: Option<[u8; 32]>,
+    transform_seed: Option<[u8; 32]>,
     encryption_iv: Option<[u8; 16]>
 }
 
@@ -18,6 +19,7 @@ impl HeaderBuilder {
             cipher: None,
             compression: None,
             master_seed: None,
+            transform_seed: None,
             encryption_iv: None
         }
     }
@@ -28,6 +30,7 @@ impl HeaderBuilder {
             Tlv::Cipher(cipher) => self.cipher = Some(cipher),
             Tlv::Compression(compression) => self.compression = Some(compression),
             Tlv::MasterSeed(seed) => self.master_seed = Some(seed),
+            Tlv::TransformSeed(seed) => self.transform_seed = Some(seed),
             Tlv::EncryptionIv(iv) => self.encryption_iv = Some(iv)
         }
     }
@@ -36,6 +39,7 @@ impl HeaderBuilder {
         if self.cipher.is_none() { Err(Error::MissingCipherType) }
         else if self.compression.is_none() { Err(Error::MissingCompressionType) }
         else if self.master_seed.is_none() { Err(Error::MissingMasterSeed) }
+        else if self.transform_seed.is_none() { Err(Error::MissingTransformSeed) }
         else if self.encryption_iv.is_none() { Err(Error::MissingEncryptionIv) }
         else {
             Ok(Header {
@@ -43,6 +47,7 @@ impl HeaderBuilder {
                 cipher: self.cipher.unwrap(),
                 compression: self.compression.unwrap(),
                 master_seed: self.master_seed.unwrap(),
+                transform_seed: self.transform_seed.unwrap(),
                 encryption_iv: self.encryption_iv.unwrap()
             })
         }
@@ -61,12 +66,14 @@ mod test {
     pub fn should_build_header() {
         let version = 0x01020304;
         let master_seed = [1; 32];
-        let iv = [2; 16];
+        let transform_seed = [2; 32];
+        let iv = [3; 16];
 
         let mut builder = HeaderBuilder::new(version);
         builder.apply(Tlv::Cipher(CipherType::Aes));
         builder.apply(Tlv::Compression(CompressionType::Gzip));
         builder.apply(Tlv::MasterSeed(master_seed));
+        builder.apply(Tlv::TransformSeed(transform_seed));
         builder.apply(Tlv::EncryptionIv(iv));
 
         let result = builder.build().unwrap();
@@ -75,6 +82,7 @@ mod test {
         assert_eq!(result.cipher, CipherType::Aes);
         assert_eq!(result.compression, CompressionType::Gzip);
         assert_eq!(result.master_seed, master_seed);
+        assert_eq!(result.transform_seed, transform_seed);
         assert_eq!(result.encryption_iv, iv);
     }
 
@@ -123,7 +131,7 @@ mod test {
     }
 
     #[test]
-    pub fn should_return_error_if_no_encryption_iv() {
+    pub fn should_return_error_if_no_transform_seed() {
         let version = 0x01020304;
         let master_seed = [1; 32];
 
@@ -131,6 +139,26 @@ mod test {
         builder.apply(Tlv::Cipher(CipherType::Aes));
         builder.apply(Tlv::Compression(CompressionType::Gzip));
         builder.apply(Tlv::MasterSeed(master_seed));
+
+        let result = builder.build();
+
+        match result {
+            Err(Error::MissingTransformSeed) => (),
+            _ => panic!("Invalid result: {:#?}", result)
+        }
+    }
+
+    #[test]
+    pub fn should_return_error_if_no_encryption_iv() {
+        let version = 0x01020304;
+        let master_seed = [1; 32];
+        let transform_seed = [2; 32];
+
+        let mut builder = HeaderBuilder::new(version);
+        builder.apply(Tlv::Cipher(CipherType::Aes));
+        builder.apply(Tlv::Compression(CompressionType::Gzip));
+        builder.apply(Tlv::MasterSeed(master_seed));
+        builder.apply(Tlv::TransformSeed(transform_seed));
 
         let result = builder.build();
 

@@ -26,6 +26,7 @@ pub enum Error {
     MissingCompressionType,
     MissingCipherType,
     MissingMasterSeed,
+    MissingTransformSeed,
     MissingEncryptionIv
 }
 
