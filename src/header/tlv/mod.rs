@@ -59,13 +59,13 @@ fn read_type_length(reader: &mut Read) -> Result<(u8, u16), Error> {
 fn read_tlv(reader: &mut Read, tlv_type: u8, length: u16) -> Result<Tlv, Error> {
     match tlv_type {
         0 => Ok(Tlv::EndOfHeader),
-        2 => cipher::read_cipher_type(reader, length),
-        3 => compression::read_compression_flags(reader, length),
-        4 => master_seed::read_master_seed(reader, length),
-        5 => transform_seed::read_transform_seed(reader, length),
-        6 => transform_rounds::read_transform_rounds(reader, length),
-        7 => iv::read_encryption_iv(reader, length),
-        8 => protected_stream_key::read_protected_stream_key(reader, length),
+        2 => cipher::read_tlv(reader, length),
+        3 => compression::read_tlv(reader, length),
+        4 => master_seed::read_tlv(reader, length),
+        5 => transform_seed::read_tlv(reader, length),
+        6 => transform_rounds::read_tlv(reader, length),
+        7 => iv::read_tlv(reader, length),
+        8 => protected_stream_key::read_tlv(reader, length),
         _ => Err(Error::UnknownTlv(tlv_type))
     }
 }

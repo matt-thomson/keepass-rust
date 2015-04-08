@@ -6,7 +6,7 @@ use header::tlv::Tlv;
 
 use std::io::Read;
 
-pub fn read_compression_flags(reader: &mut Read, length: u16) -> Result<Tlv, Error> {
+pub fn read_tlv(reader: &mut Read, length: u16) -> Result<Tlv, Error> {
     super::check_tlv_length(length, 4)
         .and_then(|_| read::read_u32(reader))
         .and_then(match_compression_flags)
@@ -32,11 +32,11 @@ mod test {
     use byteorder::{LittleEndian, WriteBytesExt};
 
     #[test]
-    fn should_read_compression_flags() {
+    fn should_read_tlv() {
         let mut bytes = vec![];
         bytes.write_u32::<LittleEndian>(1).unwrap();
 
-        let result = read_compression_flags(&mut &bytes[..], 4);
+        let result = read_tlv(&mut &bytes[..], 4);
 
         match result {
             Ok(Tlv::Compression(CompressionType::Gzip)) => (),
@@ -48,7 +48,7 @@ mod test {
     fn should_return_error_if_wrong_length() {
         let bytes = vec![];
 
-        let result = read_compression_flags(&mut &bytes[..], 3);
+        let result = read_tlv(&mut &bytes[..], 3);
 
         match result {
             Err(Error::InvalidTlvSize) => (),
@@ -61,7 +61,7 @@ mod test {
         let mut bytes = vec![];
         bytes.write_u32::<LittleEndian>(2).unwrap();
 
-        let result = read_compression_flags(&mut &bytes[..], 4);
+        let result = read_tlv(&mut &bytes[..], 4);
 
         match result {
             Err(Error::UnknownCompressionType(2)) => (),

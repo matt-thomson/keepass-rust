@@ -9,7 +9,7 @@ use std::io::Read;
 const AES_UUID_1: u64 = 0x504371BFE6F2C131;
 const AES_UUID_2: u64 = 0xFF5AFC6A210558BE;
 
-pub fn read_cipher_type(reader: &mut Read, length: u16) -> Result<Tlv, Error> {
+pub fn read_tlv(reader: &mut Read, length: u16) -> Result<Tlv, Error> {
     super::check_tlv_length(length, 16)
         .and_then(|_| read::read_u64(reader))
         .and_then(|u1| read::read_u64(reader).map(|u2| (u1, u2)))
@@ -35,12 +35,12 @@ mod test {
     use byteorder::{LittleEndian, WriteBytesExt};
 
     #[test]
-    fn should_read_cipher_type() {
+    fn should_read() {
         let mut bytes = vec![];
         bytes.write_u64::<LittleEndian>(super::AES_UUID_1).unwrap();
         bytes.write_u64::<LittleEndian>(super::AES_UUID_2).unwrap();
 
-        let result = read_cipher_type(&mut &bytes[..], 16);
+        let result = read_tlv(&mut &bytes[..], 16);
 
         match result {
             Ok(Tlv::Cipher(CipherType::Aes)) => (),
@@ -52,7 +52,7 @@ mod test {
     fn should_return_error_if_wrong_length() {
         let bytes = vec![];
 
-        let result = read_cipher_type(&mut &bytes[..], 15);
+        let result = read_tlv(&mut &bytes[..], 15);
 
         match result {
             Err(Error::InvalidTlvSize) => (),
@@ -69,7 +69,7 @@ mod test {
         bytes.write_u64::<LittleEndian>(uuid1).unwrap();
         bytes.write_u64::<LittleEndian>(uuid2).unwrap();
 
-        let result = read_cipher_type(&mut &bytes[..], 16);
+        let result = read_tlv(&mut &bytes[..], 16);
 
         match result {
             Err(Error::UnknownCipherType(u1, u2)) => {
