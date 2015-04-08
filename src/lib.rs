@@ -29,7 +29,8 @@ pub enum Error {
     MissingTransformSeed,
     MissingTransformRounds,
     MissingEncryptionIv,
-    MissingProtectedStreamKey
+    MissingProtectedStreamKey,
+    MissingStreamStartBytes
 }
 
 #[derive(Debug)]

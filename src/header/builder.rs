@@ -11,7 +11,8 @@ pub struct HeaderBuilder {
     transform_seed: Option<[u8; 32]>,
     transform_rounds: Option<u64>,
     encryption_iv: Option<[u8; 16]>,
-    protected_stream_key: Option<[u8; 32]>
+    protected_stream_key: Option<[u8; 32]>,
+    stream_start_bytes: Option<[u8; 32]>
 }
 
 impl HeaderBuilder {
@@ -24,7 +25,8 @@ impl HeaderBuilder {
             transform_seed: None,
             transform_rounds: None,
             encryption_iv: None,
-            protected_stream_key: None
+            protected_stream_key: None,
+            stream_start_bytes: None
         }
     }
 
@@ -37,7 +39,8 @@ impl HeaderBuilder {
             Tlv::TransformSeed(seed) => self.transform_seed = Some(seed),
             Tlv::TransformRounds(rounds) => self.transform_rounds = Some(rounds),
             Tlv::EncryptionIv(iv) => self.encryption_iv = Some(iv),
-            Tlv::ProtectedStreamKey(key) => self.protected_stream_key = Some(key)
+            Tlv::ProtectedStreamKey(key) => self.protected_stream_key = Some(key),
+            Tlv::StreamStartBytes(bytes) => self.stream_start_bytes = Some(bytes)
         }
     }
 
@@ -49,6 +52,7 @@ impl HeaderBuilder {
         else if self.transform_rounds.is_none() { Err(Error::MissingTransformRounds) }
         else if self.encryption_iv.is_none() { Err(Error::MissingEncryptionIv) }
         else if self.protected_stream_key.is_none() { Err(Error::MissingProtectedStreamKey) }
+        else if self.stream_start_bytes.is_none() { Err(Error::MissingStreamStartBytes) }
         else {
             Ok(Header {
                 version: self.version,
@@ -58,7 +62,8 @@ impl HeaderBuilder {
                 transform_seed: self.transform_seed.unwrap(),
                 transform_rounds: self.transform_rounds.unwrap(),
                 encryption_iv: self.encryption_iv.unwrap(),
-                protected_stream_key: self.protected_stream_key.unwrap()
+                protected_stream_key: self.protected_stream_key.unwrap(),
+                stream_start_bytes: self.stream_start_bytes.unwrap()
             })
         }
     }
@@ -80,6 +85,7 @@ mod test {
         let transform_rounds = 10000;
         let iv = [3; 16];
         let protected_stream_key = [4; 32];
+        let stream_start_bytes = [5; 32];
 
         let mut builder = HeaderBuilder::new(version);
         builder.apply(Tlv::Cipher(CipherType::Aes));
@@ -89,6 +95,7 @@ mod test {
         builder.apply(Tlv::TransformRounds(transform_rounds));
         builder.apply(Tlv::EncryptionIv(iv));
         builder.apply(Tlv::ProtectedStreamKey(protected_stream_key));
+        builder.apply(Tlv::StreamStartBytes(stream_start_bytes));
 
         let result = builder.build().unwrap();
 
@@ -100,6 +107,7 @@ mod test {
         assert_eq!(result.transform_rounds, 10000);
         assert_eq!(result.encryption_iv, iv);
         assert_eq!(result.protected_stream_key, protected_stream_key);
+        assert_eq!(result.stream_start_bytes, stream_start_bytes);
     }
 
     #[test]
@@ -226,6 +234,32 @@ mod test {
 
         match result {
             Err(Error::MissingProtectedStreamKey) => (),
+            _ => panic!("Invalid result: {:#?}", result)
+        }
+    }
+
+    #[test]
+    pub fn should_return_error_if_no_stream_start_bytes() {
+        let version = 0x01020304;
+        let master_seed = [1; 32];
+        let transform_seed = [2; 32];
+        let transform_rounds = 10000;
+        let iv = [3; 16];
+        let protected_stream_key = [4; 32];
+
+        let mut builder = HeaderBuilder::new(version);
+        builder.apply(Tlv::Cipher(CipherType::Aes));
+        builder.apply(Tlv::Compression(CompressionType::Gzip));
+        builder.apply(Tlv::MasterSeed(master_seed));
+        builder.apply(Tlv::TransformSeed(transform_seed));
+        builder.apply(Tlv::TransformRounds(transform_rounds));
+        builder.apply(Tlv::EncryptionIv(iv));
+        builder.apply(Tlv::ProtectedStreamKey(protected_stream_key));
+
+        let result = builder.build();
+
+        match result {
+            Err(Error::MissingStreamStartBytes) => (),
             _ => panic!("Invalid result: {:#?}", result)
         }
     }

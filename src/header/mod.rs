@@ -28,7 +28,8 @@ pub struct Header {
     pub transform_seed: [u8; 32],
     pub transform_rounds: u64,
     pub encryption_iv: [u8; 16],
-    pub protected_stream_key: [u8; 32]
+    pub protected_stream_key: [u8; 32],
+    pub stream_start_bytes: [u8; 32]
 }
 
 pub fn read_header(file_type: FileType, reader: &mut Read) -> Result<Header, Error> {

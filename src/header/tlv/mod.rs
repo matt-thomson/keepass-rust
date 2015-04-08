@@ -3,6 +3,7 @@ mod compression;
 mod iv;
 mod master_seed;
 mod protected_stream_key;
+mod stream_start_bytes;
 mod transform_rounds;
 mod transform_seed;
 
@@ -22,7 +23,8 @@ pub enum Tlv {
     TransformSeed([u8; 32]),
     TransformRounds(u64),
     EncryptionIv([u8; 16]),
-    ProtectedStreamKey([u8; 32])
+    ProtectedStreamKey([u8; 32]),
+    StreamStartBytes([u8; 32])
 }
 
 pub struct HeaderReader<'a> {
@@ -66,6 +68,7 @@ fn read_tlv(reader: &mut Read, tlv_type: u8, length: u16) -> Result<Tlv, Error> 
         6 => transform_rounds::read_tlv(reader, length),
         7 => iv::read_tlv(reader, length),
         8 => protected_stream_key::read_tlv(reader, length),
+        9 => stream_start_bytes::read_tlv(reader, length),
         _ => Err(Error::UnknownTlv(tlv_type))
     }
 }

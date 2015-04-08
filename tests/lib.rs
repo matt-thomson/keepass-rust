@@ -15,4 +15,5 @@ fn should_read_database() {
     assert_eq!(result.transform_rounds, 6000);
     assert_eq!(result.encryption_iv.len(), 16);
     assert_eq!(result.protected_stream_key.len(), 32);
+    assert_eq!(result.stream_start_bytes.len(), 32);
 }
