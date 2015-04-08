@@ -1,5 +1,6 @@
 mod cipher;
 mod compression;
+mod inner_random_stream;
 mod iv;
 mod master_seed;
 mod protected_stream_key;
@@ -10,7 +11,7 @@ mod transform_seed;
 use read;
 use Error;
 
-use header::{CipherType, CompressionType};
+use header::{CipherType, CompressionType, InnerRandomStreamType};
 
 use std::io::Read;
 
@@ -24,7 +25,8 @@ pub enum Tlv {
     TransformRounds(u64),
     EncryptionIv([u8; 16]),
     ProtectedStreamKey([u8; 32]),
-    StreamStartBytes([u8; 32])
+    StreamStartBytes([u8; 32]),
+    InnerRandomStream(InnerRandomStreamType)
 }
 
 pub struct HeaderReader<'a> {
@@ -69,6 +71,7 @@ fn read_tlv(reader: &mut Read, tlv_type: u8, length: u16) -> Result<Tlv, Error> 
         7 => iv::read_tlv(reader, length),
         8 => protected_stream_key::read_tlv(reader, length),
         9 => stream_start_bytes::read_tlv(reader, length),
+        10 => inner_random_stream::read_tlv(reader, length),
         _ => Err(Error::UnknownTlv(tlv_type))
     }
 }

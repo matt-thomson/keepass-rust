@@ -19,6 +19,13 @@ pub enum CompressionType {
     Gzip
 }
 
+#[derive(Debug, PartialEq)]
+pub enum InnerRandomStreamType {
+    None,
+    Rc4,
+    Salsa20
+}
+
 #[derive(Debug)]
 pub struct Header {
     pub version: u32,
@@ -29,7 +36,8 @@ pub struct Header {
     pub transform_rounds: u64,
     pub encryption_iv: [u8; 16],
     pub protected_stream_key: [u8; 32],
-    pub stream_start_bytes: [u8; 32]
+    pub stream_start_bytes: [u8; 32],
+    pub inner_random_stream: InnerRandomStreamType
 }
 
 pub fn read_header(file_type: FileType, reader: &mut Read) -> Result<Header, Error> {

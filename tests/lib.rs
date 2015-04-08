@@ -1,9 +1,8 @@
 extern crate keepass;
 
-use keepass::header::{CipherType, CompressionType};
+use keepass::header::{CipherType, CompressionType, InnerRandomStreamType};
 
 #[test]
-#[ignore]
 fn should_read_database() {
     let result = keepass::read("data/test.kdbx").unwrap();
 
@@ -16,4 +15,5 @@ fn should_read_database() {
     assert_eq!(result.encryption_iv.len(), 16);
     assert_eq!(result.protected_stream_key.len(), 32);
     assert_eq!(result.stream_start_bytes.len(), 32);
+    assert_eq!(result.inner_random_stream, InnerRandomStreamType::Salsa20);
 }

@@ -22,6 +22,7 @@ pub enum Error {
 
     UnknownCipherType(u64, u64),
     UnknownCompressionType(u32),
+    UnknownInnerRandomStreamType(u32),
 
     MissingCompressionType,
     MissingCipherType,
@@ -30,7 +31,8 @@ pub enum Error {
     MissingTransformRounds,
     MissingEncryptionIv,
     MissingProtectedStreamKey,
-    MissingStreamStartBytes
+    MissingStreamStartBytes,
+    MissingInnerRandomStream
 }
 
 #[derive(Debug)]
