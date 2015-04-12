@@ -9,18 +9,18 @@ use self::builder::HeaderBuilder;
 use std::io::Read;
 
 #[derive(Debug, PartialEq)]
-pub enum CipherType {
+enum CipherType {
     Aes
 }
 
 #[derive(Debug, PartialEq)]
-pub enum CompressionType {
+enum CompressionType {
     None,
     Gzip
 }
 
 #[derive(Debug, PartialEq)]
-pub enum InnerRandomStreamType {
+enum InnerRandomStreamType {
     None,
     Rc4,
     Salsa20
@@ -28,16 +28,16 @@ pub enum InnerRandomStreamType {
 
 #[derive(Debug)]
 pub struct Header {
-    pub version: u32,
-    pub cipher: CipherType,
-    pub compression: CompressionType,
-    pub master_seed: [u8; 32],
-    pub transform_seed: [u8; 32],
-    pub transform_rounds: u64,
-    pub encryption_iv: [u8; 16],
-    pub protected_stream_key: [u8; 32],
-    pub stream_start_bytes: [u8; 32],
-    pub inner_random_stream: InnerRandomStreamType
+    version: u32,
+    cipher: CipherType,
+    compression: CompressionType,
+    master_seed: [u8; 32],
+    transform_seed: [u8; 32],
+    transform_rounds: u64,
+    encryption_iv: [u8; 16],
+    protected_stream_key: [u8; 32],
+    stream_start_bytes: [u8; 32],
+    inner_random_stream: InnerRandomStreamType
 }
 
 pub fn read_header(file_type: FileType, reader: &mut Read) -> Result<Header, Error> {
