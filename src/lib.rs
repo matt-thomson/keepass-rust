@@ -7,6 +7,8 @@ mod header;
 mod read;
 mod signature;
 
+use crypto::symmetriccipher;
+
 use std::fs;
 use std::io;
 
@@ -33,7 +35,9 @@ pub enum Error {
     MissingEncryptionIv,
     MissingProtectedStreamKey,
     MissingStreamStartBytes,
-    MissingInnerRandomStream
+    MissingInnerRandomStream,
+
+    Cipher(symmetriccipher::SymmetricCipherError)
 }
 
 #[derive(Debug)]

@@ -3,7 +3,7 @@ use Error;
 use crypto::aes;
 use crypto::aes::KeySize;
 use crypto::blockmodes::NoPadding;
-use crypto::buffer::{BufferResult, ReadBuffer, RefReadBuffer, RefWriteBuffer, WriteBuffer};
+use crypto::buffer::{ReadBuffer, RefReadBuffer, RefWriteBuffer, WriteBuffer};
 use crypto::digest::Digest;
 use crypto::sha2::Sha256;
 use crypto::symmetriccipher::Encryptor;
@@ -55,14 +55,9 @@ fn encrypt(key: &[u8; 32], seed: &[u8; 32]) -> Result<[u8; 32], Error> {
     let mut buffer = [0; 32];
     let mut write_buffer = RefWriteBuffer::new(&mut buffer);
 
-    let result = encryptor.encrypt(&mut read_buffer, &mut write_buffer, true).ok().unwrap();
-
-    match result {
-        BufferResult::BufferUnderflow => println!("under!"),
-        BufferResult::BufferOverflow => println!("over!")
-    }
-
-    read_array!(write_buffer.take_read_buffer().take_remaining(), 32)
+    encryptor.encrypt(&mut read_buffer, &mut write_buffer, true)
+        .map_err(|e| Error::Cipher(e))
+        .and_then(|_| read_array!(write_buffer.take_read_buffer().take_remaining(), 32))
 }
 
 fn make_master_key(key: &[u8; 32], master_seed: &[u8; 32]) -> [u8; 32] {
