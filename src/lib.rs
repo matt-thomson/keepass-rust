@@ -1,4 +1,5 @@
 extern crate byteorder;
+extern crate crypto;
 
 #[macro_use] mod macros;
 
@@ -42,7 +43,7 @@ pub enum FileType {
     KeePass2
 }
 
-pub fn read(path: &str) -> Result<header::Header, Error> {
+pub fn read(path: &str, passphrase: &str) -> Result<[u8; 32], Error> {
     let mut file = match fs::File::open(path) {
         Ok(f) => f,
         Err(e) => return Err(Error::Io(e))
@@ -50,4 +51,5 @@ pub fn read(path: &str) -> Result<header::Header, Error> {
 
     signature::read_file_type(&mut file)
         .and_then(|file_type| header::read_header(file_type, &mut file))
+        .and_then(|header| header.master_key(passphrase))
 }

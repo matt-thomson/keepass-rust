@@ -1,4 +1,5 @@
 mod builder;
+mod master_key;
 mod tlv;
 
 use read;
@@ -38,6 +39,12 @@ pub struct Header {
     protected_stream_key: [u8; 32],
     stream_start_bytes: [u8; 32],
     inner_random_stream: InnerRandomStreamType
+}
+
+impl Header {
+    pub fn master_key(&self, passphrase: &str) -> Result<[u8; 32], Error> {
+        master_key::key(&self.transform_seed, self.transform_rounds, &self.master_seed, passphrase)
+    }
 }
 
 pub fn read_header(file_type: FileType, reader: &mut Read) -> Result<Header, Error> {

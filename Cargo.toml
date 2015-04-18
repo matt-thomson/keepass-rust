@@ -6,3 +6,4 @@ authors = ["Matt Thomson <mattjohnthomson@gmail.com>"]
 [dependencies]
 
 byteorder = "*"
+rust-crypto = "*"
