@@ -1,5 +1,6 @@
 mod cipher;
 mod compression;
+mod end;
 mod inner_random_stream;
 mod iv;
 mod master_seed;
@@ -62,7 +63,7 @@ fn read_type_length(reader: &mut Read) -> Result<(u8, u16), Error> {
 
 fn read_tlv(reader: &mut Read, tlv_type: u8, length: u16) -> Result<Tlv, Error> {
     match tlv_type {
-        0 => Ok(Tlv::EndOfHeader),
+        0 => end::read_tlv(reader, length),
         2 => cipher::read_tlv(reader, length),
         3 => compression::read_tlv(reader, length),
         4 => master_seed::read_tlv(reader, length),
@@ -112,7 +113,8 @@ mod test {
         bytes.write_u64::<LittleEndian>(0xFF5AFC6A210558BE).unwrap();
 
         bytes.write_u8(0).unwrap();
-        bytes.write_u16::<LittleEndian>(0).unwrap();
+        bytes.write_u16::<LittleEndian>(4).unwrap();
+        bytes.write_u32::<LittleEndian>(0x12345678).unwrap();
 
         let reader = &mut &bytes[..];
 

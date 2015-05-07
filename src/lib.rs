@@ -3,6 +3,7 @@ extern crate crypto;
 
 #[macro_use] mod macros;
 
+mod decrypt;
 mod header;
 mod read;
 mod signature;
@@ -37,7 +38,9 @@ pub enum Error {
     MissingStreamStartBytes,
     MissingInnerRandomStream,
 
-    Cipher(symmetriccipher::SymmetricCipherError)
+    Cipher(symmetriccipher::SymmetricCipherError),
+
+    IncorrectStartBytes
 }
 
 #[derive(Debug)]
@@ -47,13 +50,18 @@ pub enum FileType {
     KeePass2
 }
 
-pub fn read(path: &str, passphrase: &str) -> Result<[u8; 32], Error> {
+pub fn read(path: &str, passphrase: &str) -> Result<(), Error> {
     let mut file = match fs::File::open(path) {
         Ok(f) => f,
         Err(e) => return Err(Error::Io(e))
     };
 
-    signature::read_file_type(&mut file)
-        .and_then(|file_type| header::read_header(file_type, &mut file))
-        .and_then(|header| header.master_key(passphrase))
+    let header = match signature::read_file_type(&mut file)
+        .and_then(|file_type| header::read_header(file_type, &mut file)) {
+        Ok(h) => h,
+        Err(e) => return Err(e)
+    };
+
+    header.master_key(passphrase)
+        .and_then(|key| decrypt::check_key(&key, &header.encryption_iv(), &header.stream_start_bytes(), &mut file))
 }

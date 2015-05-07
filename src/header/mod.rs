@@ -45,6 +45,14 @@ impl Header {
     pub fn master_key(&self, passphrase: &str) -> Result<[u8; 32], Error> {
         master_key::key(&self.transform_seed, self.transform_rounds, &self.master_seed, passphrase)
     }
+
+    pub fn encryption_iv(&self) -> [u8; 16] {
+        self.encryption_iv
+    }
+
+    pub fn stream_start_bytes(&self) -> [u8; 32] {
+        self.stream_start_bytes
+    }
 }
 
 pub fn read_header(file_type: FileType, reader: &mut Read) -> Result<Header, Error> {
