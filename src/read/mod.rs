@@ -1,26 +1,18 @@
+mod aes;
+
 use Error;
 
-use crypto::aes;
-use crypto::aes::KeySize;
-use crypto::blockmodes::NoPadding;
-use crypto::buffer::{ReadBuffer, RefReadBuffer, RefWriteBuffer, WriteBuffer};
-
 use std::io::Read;
+
+use self::aes::AesStream;
 
 pub fn check_key(key: &[u8; 32],
                  iv: &[u8; 16],
                  expected: &[u8; 32],
-                 reader: &mut Read) -> Result<(), Error> {
-    let mut decryptor = aes::cbc_decryptor(KeySize::KeySize256, key, iv, NoPadding);
-    let bytes = read_array!(reader, 32).unwrap();
+                 reader: Box<Read>) -> Result<(), Error> {
+    let mut stream = AesStream::new(reader, key, iv);
 
-    let mut read_buffer = RefReadBuffer::new(&bytes);
-    let mut buffer = [0; 32];
-    let mut write_buffer = RefWriteBuffer::new(&mut buffer);
-
-    decryptor.decrypt(&mut read_buffer, &mut write_buffer, true)
-        .map_err(|e| Error::Cipher(e))
-        .and_then(|_| read_array!(write_buffer.take_read_buffer().take_remaining(), 32))
+    read_array!(&mut stream, 32)
         .and_then(|result| check(&result, expected))
 }
 
