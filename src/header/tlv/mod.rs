@@ -9,7 +9,7 @@ mod stream_start_bytes;
 mod transform_rounds;
 mod transform_seed;
 
-use read;
+use bytes;
 use Error;
 
 use header::{CipherType, CompressionType, InnerRandomStreamType};
@@ -57,8 +57,8 @@ impl <'a> Iterator for HeaderReader<'a> {
 }
 
 fn read_type_length(reader: &mut Read) -> Result<(u8, u16), Error> {
-    read::read_u8(reader)
-        .and_then(|tlv_type| read::read_u16(reader).map(|length| (tlv_type, length)))
+    bytes::read_u8(reader)
+        .and_then(|tlv_type| bytes::read_u16(reader).map(|length| (tlv_type, length)))
 }
 
 fn read_tlv(reader: &mut Read, tlv_type: u8, length: u16) -> Result<Tlv, Error> {

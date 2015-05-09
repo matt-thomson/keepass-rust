@@ -1,4 +1,4 @@
-use read;
+use bytes;
 use Error;
 
 use header::CipherType;
@@ -11,8 +11,8 @@ const AES_UUID_2: u64 = 0xFF5AFC6A210558BE;
 
 pub fn read_tlv(reader: &mut Read, length: u16) -> Result<Tlv, Error> {
     super::check_tlv_length(length, 16)
-        .and_then(|_| read::read_u64(reader))
-        .and_then(|u1| read::read_u64(reader).map(|u2| (u1, u2)))
+        .and_then(|_| bytes::read_u64(reader))
+        .and_then(|u1| bytes::read_u64(reader).map(|u2| (u1, u2)))
         .and_then(|(u1, u2)| match_cipher_type(u1, u2))
         .map(|cipher| Tlv::Cipher(cipher))
 }

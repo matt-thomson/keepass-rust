@@ -1,4 +1,4 @@
-use read;
+use bytes;
 use {Error, FileType};
 
 use std::io::Read;
@@ -9,9 +9,9 @@ const SIGNATURE_KEEPASS2_PRE_RELEASE: u32  = 0xB54BFB66;
 const SIGNATURE_KEEPASS2: u32  = 0xB54BFB67;
 
 pub fn read_file_type(reader: &mut Read) -> Result<FileType, Error> {
-    read::read_u32(reader)
+    bytes::read_u32(reader)
         .and_then(check_file_signature)
-        .and_then(|_| read::read_u32(reader))
+        .and_then(|_| bytes::read_u32(reader))
         .and_then(match_file_type)
 }
 

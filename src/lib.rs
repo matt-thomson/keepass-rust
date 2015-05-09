@@ -3,9 +3,9 @@ extern crate crypto;
 
 #[macro_use] mod macros;
 
+mod bytes;
 mod decrypt;
 mod header;
-mod read;
 mod signature;
 
 use crypto::symmetriccipher;

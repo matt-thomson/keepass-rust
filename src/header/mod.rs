@@ -2,7 +2,7 @@ mod builder;
 mod master_key;
 mod tlv;
 
-use read;
+use bytes;
 use {Error, FileType};
 
 use self::builder::HeaderBuilder;
@@ -69,7 +69,7 @@ fn check_file_type(file_type: FileType) -> Result<(), Error> {
 }
 
 fn read_version(reader: &mut Read) -> Result<u32, Error> {
-    read::read_u32(reader)
+    bytes::read_u32(reader)
 }
 
 fn handle_tlvs(reader: &mut Read, version: u32) -> Result<Header, Error> {
