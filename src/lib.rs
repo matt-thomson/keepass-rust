@@ -63,5 +63,5 @@ pub fn read(path: &str, passphrase: &str) -> Result<(), Error> {
     };
 
     header.master_key(passphrase)
-        .and_then(|key| read::check_key(&key, &header.encryption_iv(), &header.stream_start_bytes(), Box::new(file)))
+        .and_then(|key| read::check_key(&key, &header.encryption_iv(), &header.stream_start_bytes(), &mut file))
 }

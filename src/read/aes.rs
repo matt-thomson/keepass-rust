@@ -6,20 +6,20 @@ use crypto::blockmodes::NoPadding;
 use crypto::buffer::{RefReadBuffer, RefWriteBuffer};
 use crypto::symmetriccipher::Decryptor;
 
-pub struct AesStream {
-    delegate: Box<Read>,
+pub struct AesStream<'a> {
+    delegate: &'a mut Read,
     decryptor: Box<Decryptor>
 }
 
-impl AesStream {
-    pub fn new(delegate: Box<Read>, key: &[u8; 32], iv: &[u8; 16]) -> AesStream {
+impl <'a> AesStream<'a> {
+    pub fn new(delegate: &'a mut Read, key: &[u8; 32], iv: &[u8; 16]) -> AesStream<'a> {
         let decryptor = aes::cbc_decryptor(KeySize::KeySize256, key, iv, NoPadding);
 
         AesStream { delegate: delegate, decryptor: decryptor }
     }
 }
 
-impl Read for AesStream {
+impl <'a> Read for AesStream<'a> {
     fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
         let mut in_buffer = vec![0; buf.len()];
         let bytes_read = self.delegate.read(&mut in_buffer);

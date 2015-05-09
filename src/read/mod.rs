@@ -9,7 +9,7 @@ use self::aes::AesStream;
 pub fn check_key(key: &[u8; 32],
                  iv: &[u8; 16],
                  expected: &[u8; 32],
-                 reader: Box<Read>) -> Result<(), Error> {
+                 reader: &mut Read) -> Result<(), Error> {
     let mut stream = AesStream::new(reader, key, iv);
 
     read_array!(&mut stream, 32)
