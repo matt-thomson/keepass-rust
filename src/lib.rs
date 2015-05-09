@@ -4,44 +4,14 @@ extern crate crypto;
 #[macro_use] mod macros;
 
 mod bytes;
+mod error;
 mod header;
 mod read;
 mod signature;
 
-use crypto::symmetriccipher;
-
 use std::fs;
-use std::io;
 
-#[derive(Debug)]
-pub enum Error {
-    UnexpectedEOF,
-    Io(io::Error),
-
-    InvalidSignature(u32),
-    InvalidFileType(u32),
-    UnsupportedFileType(FileType),
-    UnknownTlv(u8),
-    InvalidTlvSize,
-
-    UnknownCipherType(u64, u64),
-    UnknownCompressionType(u32),
-    UnknownInnerRandomStreamType(u32),
-
-    MissingCompressionType,
-    MissingCipherType,
-    MissingMasterSeed,
-    MissingTransformSeed,
-    MissingTransformRounds,
-    MissingEncryptionIv,
-    MissingProtectedStreamKey,
-    MissingStreamStartBytes,
-    MissingInnerRandomStream,
-
-    Cipher(symmetriccipher::SymmetricCipherError),
-
-    IncorrectStartBytes
-}
+pub use error::Error;
 
 #[derive(Debug)]
 pub enum FileType {
@@ -50,7 +20,7 @@ pub enum FileType {
     KeePass2
 }
 
-pub fn read(path: &str, passphrase: &str) -> Result<(), Error> {
+pub fn read(path: &str, passphrase: &str) -> Result<String, Error> {
     let mut file = match fs::File::open(path) {
         Ok(f) => f,
         Err(e) => return Err(Error::Io(e))
@@ -63,5 +33,5 @@ pub fn read(path: &str, passphrase: &str) -> Result<(), Error> {
     };
 
     header.master_key(passphrase)
-        .and_then(|key| read::check_key(&key, &header.encryption_iv(), &header.stream_start_bytes(), &mut file))
+        .and_then(|key| read::read(&key, &header.encryption_iv(), &header.stream_start_bytes(), &mut file))
 }
