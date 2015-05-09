@@ -4,13 +4,13 @@ use Error;
 
 use std::io::Read;
 
-use self::aes::AesStream;
+use self::aes::AesReader;
 
 pub fn check_key(key: &[u8; 32],
                  iv: &[u8; 16],
                  expected: &[u8; 32],
                  reader: &mut Read) -> Result<(), Error> {
-    let mut stream = AesStream::new(reader, key, iv);
+    let mut stream = AesReader::new(reader, key, iv);
 
     read_array!(&mut stream, 32)
         .and_then(|result| check(&result, expected))
