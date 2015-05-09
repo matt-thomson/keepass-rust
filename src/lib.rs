@@ -4,8 +4,8 @@ extern crate crypto;
 #[macro_use] mod macros;
 
 mod bytes;
-mod decrypt;
 mod header;
+mod read;
 mod signature;
 
 use crypto::symmetriccipher;
@@ -63,5 +63,5 @@ pub fn read(path: &str, passphrase: &str) -> Result<(), Error> {
     };
 
     header.master_key(passphrase)
-        .and_then(|key| decrypt::check_key(&key, &header.encryption_iv(), &header.stream_start_bytes(), &mut file))
+        .and_then(|key| read::check_key(&key, &header.encryption_iv(), &header.stream_start_bytes(), &mut file))
 }
