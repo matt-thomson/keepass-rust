@@ -9,7 +9,8 @@ mod header;
 mod read;
 mod signature;
 
-use std::fs;
+use std::fs::File;
+use std::path::Path;
 
 pub use error::Error;
 
@@ -20,8 +21,8 @@ pub enum FileType {
     KeePass2
 }
 
-pub fn read(path: &str, passphrase: &str) -> Result<String, Error> {
-    let mut file = match fs::File::open(path) {
+pub fn read<P: AsRef<Path>>(path: P, passphrase: &str) -> Result<String, Error> {
+    let mut file = match File::open(path) {
         Ok(f) => f,
         Err(e) => return Err(Error::Io(e))
     };
