@@ -1,33 +1,32 @@
-use std::io::{Read, Result};
+use std::io::Read;
 
 use crypto::aes;
 use crypto::aes::KeySize;
 use crypto::blockmodes::NoPadding;
-use crypto::buffer::{RefReadBuffer, RefWriteBuffer};
+use crypto::buffer::{BufferResult, ReadBuffer, RefReadBuffer, RefWriteBuffer, WriteBuffer};
 use crypto::symmetriccipher::Decryptor;
 
-pub struct AesReader<'a> {
-    delegate: &'a mut Read,
-    decryptor: Box<Decryptor>
-}
+use Error;
 
-impl <'a> AesReader<'a> {
-    pub fn new(delegate: &'a mut Read, key: &[u8; 32], iv: &[u8; 16]) -> AesReader<'a> {
-        let decryptor = aes::cbc_decryptor(KeySize::KeySize256, key, iv, NoPadding);
+pub fn decrypt(reader: &mut Read, key: &[u8; 32], iv: &[u8; 16]) -> Result<Vec<u8>, Error> {
+    let mut decryptor = aes::cbc_decryptor(KeySize::KeySize256, key, iv, NoPadding);
 
-        AesReader { delegate: delegate, decryptor: decryptor }
+    let mut in_buffer = vec![];
+    reader.read_to_end(&mut in_buffer);
+
+    let mut final_result = vec![];
+    let mut read_buffer = RefReadBuffer::new(&in_buffer);
+    let mut buffer = [0; 4096];
+    let mut write_buffer = RefWriteBuffer::new(&mut buffer);
+
+    loop {
+        let result = decryptor.decrypt(&mut read_buffer, &mut write_buffer, true).unwrap();
+        final_result.extend(write_buffer.take_read_buffer().take_remaining().iter().map(|&i| i));
+        match result {
+            BufferResult::BufferUnderflow => break,
+            BufferResult::BufferOverflow => { }
+        }
     }
-}
 
-impl <'a> Read for AesReader<'a> {
-    fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
-        let mut in_buffer = vec![0; buf.len()];
-        let bytes_read = self.delegate.read(&mut in_buffer);
-
-        let mut read_buffer = RefReadBuffer::new(&in_buffer);
-        let mut write_buffer = RefWriteBuffer::new(buf);
-
-        self.decryptor.decrypt(&mut read_buffer, &mut write_buffer, true).unwrap();
-        bytes_read
-    }
+    Ok(final_result)
 }

@@ -3,16 +3,18 @@ mod block;
 
 use Error;
 
-use std::io::Read;
+use std::io::{Cursor, Read};
 
-use self::aes::AesReader;
 use self::block::BlockReader;
 
 pub fn read(key: &[u8; 32],
             iv: &[u8; 16],
             expected: &[u8; 32],
             reader: &mut Read) -> Result<String, Error> {
-    let mut stream = AesReader::new(reader, key, iv);
+    let mut stream = match aes::decrypt(reader, key, iv) {
+        Ok(s) => Cursor::new(s),
+        Err(e) => return Err(e)
+    };
 
     read_array!(&mut stream, 32)
         .and_then(|result| check_key(&result, expected))
