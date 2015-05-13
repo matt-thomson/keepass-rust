@@ -2,14 +2,14 @@ use std::io::Read;
 
 use crypto::aes;
 use crypto::aes::KeySize;
-use crypto::blockmodes::NoPadding;
+use crypto::blockmodes::PkcsPadding;
 use crypto::buffer::{BufferResult, ReadBuffer, RefReadBuffer, RefWriteBuffer, WriteBuffer};
 use crypto::symmetriccipher::Decryptor;
 
 use Error;
 
 pub fn decrypt(reader: &mut Read, key: &[u8; 32], iv: &[u8; 16]) -> Result<Vec<u8>, Error> {
-    let mut decryptor = aes::cbc_decryptor(KeySize::KeySize256, key, iv, NoPadding);
+    let mut decryptor = aes::cbc_decryptor(KeySize::KeySize256, key, iv, PkcsPadding);
 
     let mut in_buffer = vec![];
     try!(reader.read_to_end(&mut in_buffer).map_err(|e| Error::Io(e)));
