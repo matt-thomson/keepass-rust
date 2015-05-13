@@ -12,7 +12,7 @@ pub fn decrypt(reader: &mut Read, key: &[u8; 32], iv: &[u8; 16]) -> Result<Vec<u
     let mut decryptor = aes::cbc_decryptor(KeySize::KeySize256, key, iv, NoPadding);
 
     let mut in_buffer = vec![];
-    reader.read_to_end(&mut in_buffer);
+    try!(reader.read_to_end(&mut in_buffer).map_err(|e| Error::Io(e)));
 
     let mut final_result = vec![];
     let mut read_buffer = RefReadBuffer::new(&in_buffer);
@@ -20,7 +20,8 @@ pub fn decrypt(reader: &mut Read, key: &[u8; 32], iv: &[u8; 16]) -> Result<Vec<u
     let mut write_buffer = RefWriteBuffer::new(&mut buffer);
 
     loop {
-        let result = decryptor.decrypt(&mut read_buffer, &mut write_buffer, true).unwrap();
+        let result = try!(decryptor.decrypt(&mut read_buffer, &mut write_buffer, true)
+            .map_err(|e| Error::Cipher(e)));
         final_result.extend(write_buffer.take_read_buffer().take_remaining().iter().map(|&i| i));
         match result {
             BufferResult::BufferUnderflow => break,

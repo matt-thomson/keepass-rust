@@ -30,10 +30,12 @@ impl <'a> BlockReader<'a> {
         let block_id = bytes::read_u32(self.delegate);
         match block_id {
             Ok(id) => {
-                self.check_block_id(id)
-                    .and_then(|_| read_array!(self.delegate, 32))
-                    .and_then(|hash| bytes::read_u32(self.delegate).map(|size| (size, hash)))
-                    .and_then(|(size, hash)| self.read_and_check_block(size as usize, &hash))
+                try!(self.check_block_id(id));
+                
+                let hash = try!(read_array!(self.delegate, 32));
+                let size = try!(bytes::read_u32(self.delegate));
+
+                self.read_and_check_block(size as usize, &hash)
             },
             Err(Error::UnexpectedEOF) => {
                 self.block = vec![];
@@ -45,9 +47,9 @@ impl <'a> BlockReader<'a> {
 
     fn read_and_check_block(&mut self, size: usize, hash: &[u8; 32]) -> Result<(), Error> {
         let mut buf = vec![0; size];
-        self.delegate.read(&mut buf)
-            .map_err(|e| Error::Io(e))
-            .and_then(|_| check_block(&buf, &hash))
+        try!(self.delegate.read(&mut buf).map_err(|e| Error::Io(e)));
+
+        check_block(&buf, &hash)
     }
 
     fn block(&self) -> &[u8] {
@@ -61,9 +63,8 @@ impl <'a> BlockReader<'a> {
 
 impl <'a> Read for BlockReader<'a> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        self.read_if_required()
-            .map_err(|e| io::Error::new(io::ErrorKind::Other, e))
-            .and_then(|_| self.block().read(buf))
+        try!(self.read_if_required().map_err(|e| io::Error::new(io::ErrorKind::Other, e)));
+        self.block().read(buf)
     }
 }
 
