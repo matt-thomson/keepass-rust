@@ -9,10 +9,11 @@ const SIGNATURE_KEEPASS2_PRE_RELEASE: u32  = 0xB54BFB66;
 const SIGNATURE_KEEPASS2: u32  = 0xB54BFB67;
 
 pub fn read_file_type(reader: &mut Read) -> Result<FileType, Error> {
-    bytes::read_u32(reader)
-        .and_then(check_file_signature)
-        .and_then(|_| bytes::read_u32(reader))
-        .and_then(match_file_type)
+    let signature = try!(bytes::read_u32(reader));
+    try!(check_file_signature(signature));
+
+    let file_type = try!(bytes::read_u32(reader));
+    match_file_type(file_type)
 }
 
 fn check_file_signature(sig: u32) -> Result<(), Error> {

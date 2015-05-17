@@ -22,17 +22,11 @@ pub enum FileType {
 }
 
 pub fn read<P: AsRef<Path>>(path: P, passphrase: &str) -> Result<String, Error> {
-    let mut file = match File::open(path) {
-        Ok(f) => f,
-        Err(e) => return Err(Error::Io(e))
-    };
+    let mut file = try!(File::open(path).map_err(|e| Error::Io(e)));
 
-    let header = match signature::read_file_type(&mut file)
-        .and_then(|file_type| header::read_header(file_type, &mut file)) {
-        Ok(h) => h,
-        Err(e) => return Err(e)
-    };
+    let file_type = try!(signature::read_file_type(&mut file));
+    let header = try!(header::read_header(file_type, &mut file));
 
-    header.master_key(passphrase)
-        .and_then(|key| read::read(&key, &header.encryption_iv(), &header.stream_start_bytes(), &mut file))
+    let master_key = try!(header.master_key(passphrase));
+    read::read(&master_key, &header.encryption_iv(), &header.stream_start_bytes(), &mut file)
 }
