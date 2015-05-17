@@ -6,9 +6,10 @@ use header::tlv::Tlv;
 use std::io::Read;
 
 pub fn read_tlv(reader: &mut Read, length: u16) -> Result<Tlv, Error> {
-    super::check_tlv_length(length, 8)
-        .and_then(|_| bytes::read_u64(reader))
-        .map(|rounds| Tlv::TransformRounds(rounds))
+    try!(super::check_tlv_length(length, 8));
+
+    let rounds = try!(bytes::read_u64(reader));
+    Ok(Tlv::TransformRounds(rounds))
 }
 
 #[cfg(test)]

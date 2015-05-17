@@ -7,9 +7,10 @@ use std::io::Read;
 const IV_LENGTH: usize = 16;
 
 pub fn read_tlv(reader: &mut Read, length: u16) -> Result<Tlv, Error> {
-    super::check_tlv_length(length, IV_LENGTH as u16)
-        .and_then(|_| read_array!(reader, IV_LENGTH))
-        .map(|iv| Tlv::EncryptionIv(iv))
+    try!(super::check_tlv_length(length, IV_LENGTH as u16));
+
+    let iv = try!(read_array!(reader, IV_LENGTH));
+    Ok(Tlv::EncryptionIv(iv))
 }
 
 #[cfg(test)]

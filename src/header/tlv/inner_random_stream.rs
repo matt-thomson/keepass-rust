@@ -7,10 +7,12 @@ use header::tlv::Tlv;
 use std::io::Read;
 
 pub fn read_tlv(reader: &mut Read, length: u16) -> Result<Tlv, Error> {
-    super::check_tlv_length(length, 4)
-        .and_then(|_| bytes::read_u32(reader))
-        .and_then(match_stream_id)
-        .map(|stream| Tlv::InnerRandomStream(stream))
+    try!(super::check_tlv_length(length, 4));
+
+    let stream_id = try!(bytes::read_u32(reader));
+    let stream_type = try!(match_stream_id(stream_id));
+
+    Ok(Tlv::InnerRandomStream(stream_type))
 }
 
 fn match_stream_id(stream_id: u32) -> Result<InnerRandomStreamType, Error> {

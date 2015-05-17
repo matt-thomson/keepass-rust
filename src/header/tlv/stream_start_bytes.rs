@@ -7,9 +7,10 @@ use std::io::Read;
 const STREAM_START_BYTES_LENGTH: usize = 32;
 
 pub fn read_tlv(reader: &mut Read, length: u16) -> Result<Tlv, Error> {
-    super::check_tlv_length(length, STREAM_START_BYTES_LENGTH as u16)
-        .and_then(|_| read_array!(reader, STREAM_START_BYTES_LENGTH))
-        .map(|seed| Tlv::StreamStartBytes(seed))
+    try!(super::check_tlv_length(length, STREAM_START_BYTES_LENGTH as u16));
+
+    let seed = try!(read_array!(reader, STREAM_START_BYTES_LENGTH));
+    Ok(Tlv::StreamStartBytes(seed))
 }
 
 #[cfg(test)]

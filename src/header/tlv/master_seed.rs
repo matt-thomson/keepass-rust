@@ -7,9 +7,10 @@ use std::io::Read;
 const MASTER_SEED_LENGTH: usize = 32;
 
 pub fn read_tlv(reader: &mut Read, length: u16) -> Result<Tlv, Error> {
-    super::check_tlv_length(length, MASTER_SEED_LENGTH as u16)
-        .and_then(|_| read_array!(reader, MASTER_SEED_LENGTH))
-        .map(|seed| Tlv::MasterSeed(seed))
+    try!(super::check_tlv_length(length, MASTER_SEED_LENGTH as u16));
+
+    let seed = try!(read_array!(reader, MASTER_SEED_LENGTH));
+    Ok(Tlv::MasterSeed(seed))
 }
 
 #[cfg(test)]

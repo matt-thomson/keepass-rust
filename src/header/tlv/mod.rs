@@ -57,8 +57,10 @@ impl <'a> Iterator for HeaderReader<'a> {
 }
 
 fn read_type_length(reader: &mut Read) -> Result<(u8, u16), Error> {
-    bytes::read_u8(reader)
-        .and_then(|tlv_type| bytes::read_u16(reader).map(|length| (tlv_type, length)))
+    let tlv_type = try!(bytes::read_u8(reader));
+    let length = try!(bytes::read_u16(reader));
+
+    Ok((tlv_type, length))
 }
 
 fn read_tlv(reader: &mut Read, tlv_type: u8, length: u16) -> Result<Tlv, Error> {

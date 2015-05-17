@@ -7,9 +7,10 @@ use std::io::Read;
 const PROTECTED_STREAM_KEY_LENGTH: usize = 32;
 
 pub fn read_tlv(reader: &mut Read, length: u16) -> Result<Tlv, Error> {
-    super::check_tlv_length(length, PROTECTED_STREAM_KEY_LENGTH as u16)
-        .and_then(|_| read_array!(reader, PROTECTED_STREAM_KEY_LENGTH))
-        .map(|seed| Tlv::ProtectedStreamKey(seed))
+    try!(super::check_tlv_length(length, PROTECTED_STREAM_KEY_LENGTH as u16));
+
+    let seed = try!(read_array!(reader, PROTECTED_STREAM_KEY_LENGTH));
+    Ok(Tlv::ProtectedStreamKey(seed))
 }
 
 #[cfg(test)]

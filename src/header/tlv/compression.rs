@@ -7,10 +7,12 @@ use header::tlv::Tlv;
 use std::io::Read;
 
 pub fn read_tlv(reader: &mut Read, length: u16) -> Result<Tlv, Error> {
-    super::check_tlv_length(length, 4)
-        .and_then(|_| bytes::read_u32(reader))
-        .and_then(match_compression_flags)
-        .map(|flag| Tlv::Compression(flag))
+    try!(super::check_tlv_length(length, 4));
+
+    let flags = try!(bytes::read_u32(reader));
+    let compression_type = try!(match_compression_flags(flags));
+
+    Ok(Tlv::Compression(compression_type))
 }
 
 fn match_compression_flags(flags: u32) -> Result<CompressionType, Error> {
