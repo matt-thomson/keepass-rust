@@ -7,3 +7,4 @@ authors = ["Matt Thomson <mattjohnthomson@gmail.com>"]
 
 byteorder = "*"
 rust-crypto = "*"
+xml-rs = "*"

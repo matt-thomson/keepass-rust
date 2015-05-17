@@ -1,5 +1,6 @@
 extern crate byteorder;
 extern crate crypto;
+extern crate xml;
 
 #[macro_use] mod macros;
 
@@ -21,7 +22,7 @@ pub enum FileType {
     KeePass2
 }
 
-pub fn read<P: AsRef<Path>>(path: P, passphrase: &str) -> Result<String, Error> {
+pub fn read<P: AsRef<Path>>(path: P, passphrase: &str) -> Result<(), Error> {
     let mut file = try!(File::open(path).map_err(|e| Error::Io(e)));
 
     let file_type = try!(signature::read_file_type(&mut file));
