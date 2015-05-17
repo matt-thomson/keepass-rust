@@ -14,8 +14,8 @@ pub fn key(transform_seed: &[u8; 32],
            transform_rounds: u64,
            master_seed: &[u8; 32],
            passphrase: &str) -> Result<[u8; 32], Error> {
-    transform_key(&composite_key(passphrase), transform_seed, transform_rounds)
-        .map(|k| make_master_key(&k, &master_seed))
+    let key = try!(transform_key(&composite_key(passphrase), transform_seed, transform_rounds));
+    Ok(make_master_key(&key, &master_seed))
 }
 
 fn sha256(input: &[u8]) -> [u8; 32] {
@@ -39,13 +39,13 @@ fn composite_key(passphrase: &str) -> [u8; 32] {
 }
 
 fn transform_key(key: &[u8; 32], seed: &[u8; 32], rounds: u64) -> Result<[u8; 32], Error> {
-    let mut result = Ok(*key);
+    let mut result = *key;
 
     for _ in 0..rounds {
-        result = result.and_then(|r| encrypt(&r, &seed));
+        result = try!(encrypt(&result, &seed));
     }
 
-    result.map(|r| sha256(&r))
+    Ok(sha256(&result))
 }
 
 fn encrypt(key: &[u8; 32], seed: &[u8; 32]) -> Result<[u8; 32], Error> {
@@ -55,9 +55,8 @@ fn encrypt(key: &[u8; 32], seed: &[u8; 32]) -> Result<[u8; 32], Error> {
     let mut buffer = [0; 32];
     let mut write_buffer = RefWriteBuffer::new(&mut buffer);
 
-    encryptor.encrypt(&mut read_buffer, &mut write_buffer, true)
-        .map_err(|e| Error::Cipher(e))
-        .and_then(|_| read_array!(write_buffer.take_read_buffer().take_remaining(), 32))
+    try!(encryptor.encrypt(&mut read_buffer, &mut write_buffer, true).map_err(|e| Error::Cipher(e)));
+    read_array!(write_buffer.take_read_buffer().take_remaining(), 32)
 }
 
 fn make_master_key(key: &[u8; 32], master_seed: &[u8; 32]) -> [u8; 32] {

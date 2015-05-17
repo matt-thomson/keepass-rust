@@ -56,9 +56,10 @@ impl Header {
 }
 
 pub fn read_header(file_type: FileType, reader: &mut Read) -> Result<Header, Error> {
-    check_file_type(file_type)
-        .and_then(|_| read_version(reader))
-        .and_then(|version| handle_tlvs(reader, version))
+    try!(check_file_type(file_type));
+
+    let version = try!(read_version(reader));
+    handle_tlvs(reader, version)
 }
 
 fn check_file_type(file_type: FileType) -> Result<(), Error> {
