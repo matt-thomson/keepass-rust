@@ -1,10 +1,10 @@
 mod aes;
 mod block;
+mod xml;
 
 use Error;
 
 use std::io::{Cursor, Read};
-use xml::reader::EventReader;
 
 use self::block::BlockReader;
 
@@ -18,13 +18,7 @@ pub fn read(key: &[u8; 32],
     try!(check_key(&result, expected));
 
     let mut block_reader = BlockReader::new(&mut stream);
-    let mut event_reader = EventReader::new(block_reader);
-
-    for e in event_reader.events() {
-        println!("{:?}", e);
-    }
-
-    Ok(())
+    xml::read(&mut block_reader)
 }
 
 fn check_key(result: &[u8; 32], expected: &[u8; 32]) -> Result<(), Error> {
