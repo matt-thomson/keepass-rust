@@ -3,14 +3,15 @@ use FileType;
 use std;
 use std::fmt;
 use std::fmt::{Display, Formatter};
-use std::io;
+use std::io::Error as IoError;
 
-use crypto::symmetriccipher;
+use crypto::symmetriccipher::SymmetricCipherError;
+use xml::reader::Error as XmlError;
 
 #[derive(Debug)]
 pub enum Error {
     UnexpectedEOF,
-    Io(io::Error),
+    Io(IoError),
 
     InvalidSignature(u32),
     InvalidFileType(u32),
@@ -32,11 +33,18 @@ pub enum Error {
     MissingStreamStartBytes,
     MissingInnerRandomStream,
 
-    Cipher(symmetriccipher::SymmetricCipherError),
+    Cipher(SymmetricCipherError),
 
     IncorrectStartBytes,
     IncorrectBlockId,
     IncorrectBlockHash,
+
+    Xml(XmlError),
+
+    MissingKey,
+    MissingTitle,
+    MissingUsername,
+    MissingPassword,
 }
 
 impl std::error::Error for Error {

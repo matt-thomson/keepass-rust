@@ -14,7 +14,7 @@ mod signature;
 use std::fs::File;
 use std::path::Path;
 
-pub use database::Database;
+pub use database::{Database, DatabaseEntry};
 pub use error::Error;
 
 #[derive(Debug)]
@@ -24,7 +24,7 @@ pub enum FileType {
     KeePass2,
 }
 
-pub fn read<P: AsRef<Path>>(path: P, passphrase: &str) -> Result<(), Error> {
+pub fn read<P: AsRef<Path>>(path: P, passphrase: &str) -> Result<Database, Error> {
     let mut file = try!(File::open(path).map_err(|e| Error::Io(e)));
 
     let file_type = try!(signature::read_file_type(&mut file));

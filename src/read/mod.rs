@@ -2,7 +2,7 @@ mod aes;
 mod block;
 mod xml;
 
-use Error;
+use {Database, Error};
 
 use std::io::{Cursor, Read};
 
@@ -12,7 +12,7 @@ pub fn read(key: &[u8; 32],
             iv: &[u8; 16],
             expected: &[u8; 32],
             reader: &mut Read)
-            -> Result<(), Error> {
+            -> Result<Database, Error> {
     let mut stream = Cursor::new(try!(aes::decrypt(reader, key, iv)));
 
     let result = try!(read_array!(&mut stream, 32));

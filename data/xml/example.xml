@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<KeePassFile>
+	<Root>
+		<Group>
+			<UUID>NQ7IDchX4EaBjopMEgDORA==</UUID>
+			<Entry>
+				<UUID>BoUeiK+XGUeIQisekLa2uw==</UUID>
+				<String>
+					<Key>Password</Key>
+					<Value Protected="True">9crW5hp7SQ==</Value>
+				</String>
+				<String>
+					<Key>Title</Key>
+					<Value>http://example.com</Value>
+				</String>
+				<String>
+					<Key>URL</Key>
+					<Value />
+				</String>
+				<String>
+					<Key>UserName</Key>
+					<Value>joe.bloggs</Value>
+				</String>
+			</Entry>
+		</Group>
+	</Root>
+</KeePassFile>

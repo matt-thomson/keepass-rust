@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct DatabaseEntry {
     title: String,
     username: String,

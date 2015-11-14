@@ -1,0 +1,8 @@
+<String>
+  <Key>Foo</Key>
+  <Value>http://example.com/foo</Value>
+</String>
+<String>
+  <Key>Bar</Key>
+  <Value>http://example.com/bar</Value>
+</String>
