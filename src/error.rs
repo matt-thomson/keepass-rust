@@ -36,7 +36,7 @@ pub enum Error {
 
     IncorrectStartBytes,
     IncorrectBlockId,
-    IncorrectBlockHash
+    IncorrectBlockHash,
 }
 
 impl std::error::Error for Error {

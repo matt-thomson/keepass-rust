@@ -21,11 +21,11 @@ pub fn decrypt(reader: &mut Read, key: &[u8; 32], iv: &[u8; 16]) -> Result<Vec<u
 
     loop {
         let result = try!(decryptor.decrypt(&mut read_buffer, &mut write_buffer, true)
-            .map_err(|e| Error::Cipher(e)));
+                                   .map_err(|e| Error::Cipher(e)));
         final_result.extend(write_buffer.take_read_buffer().take_remaining().iter().map(|&i| i));
         match result {
             BufferResult::BufferUnderflow => break,
-            BufferResult::BufferOverflow => { }
+            BufferResult::BufferOverflow => {}
         }
     }
 

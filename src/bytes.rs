@@ -24,7 +24,7 @@ pub fn read_u64(reader: &mut Read) -> Result<u64, Error> {
 fn handle_error(err: byteorder::Error) -> Error {
     match err {
         byteorder::Error::UnexpectedEOF => Error::UnexpectedEOF,
-        byteorder::Error::Io(e) => Error::Io(e)
+        byteorder::Error::Io(e) => Error::Io(e),
     }
 }
 
@@ -49,7 +49,7 @@ mod test {
 
         match result {
             Err(Error::UnexpectedEOF) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -68,7 +68,7 @@ mod test {
 
         match result {
             Err(Error::UnexpectedEOF) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -87,7 +87,7 @@ mod test {
 
         match result {
             Err(Error::UnexpectedEOF) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -106,7 +106,7 @@ mod test {
 
         match result {
             Err(Error::UnexpectedEOF) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 }

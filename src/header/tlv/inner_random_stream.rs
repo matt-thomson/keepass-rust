@@ -20,7 +20,7 @@ fn match_stream_id(stream_id: u32) -> Result<InnerRandomStreamType, Error> {
         0 => Ok(InnerRandomStreamType::None),
         1 => Ok(InnerRandomStreamType::Rc4),
         2 => Ok(InnerRandomStreamType::Salsa20),
-        _ => Err(Error::UnknownInnerRandomStreamType(stream_id))
+        _ => Err(Error::UnknownInnerRandomStreamType(stream_id)),
     }
 }
 
@@ -43,7 +43,7 @@ mod test {
 
         match result {
             Ok(Tlv::InnerRandomStream(InnerRandomStreamType::Rc4)) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -55,7 +55,7 @@ mod test {
 
         match result {
             Err(Error::InvalidTlvSize) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -68,7 +68,7 @@ mod test {
 
         match result {
             Err(Error::UnknownInnerRandomStreamType(3)) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 }

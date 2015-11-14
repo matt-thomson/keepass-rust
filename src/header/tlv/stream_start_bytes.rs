@@ -27,7 +27,7 @@ mod test {
 
         match result {
             Ok(Tlv::StreamStartBytes(seed)) => assert_eq!(seed, bytes),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -38,7 +38,7 @@ mod test {
 
         match result {
             Err(Error::InvalidTlvSize) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 }

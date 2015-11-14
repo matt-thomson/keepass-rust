@@ -30,7 +30,7 @@ mod test {
 
         match result {
             Ok(Tlv::TransformRounds(rounds)) => assert_eq!(rounds, 1234),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -42,7 +42,7 @@ mod test {
 
         match result {
             Err(Error::InvalidTlvSize) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 }

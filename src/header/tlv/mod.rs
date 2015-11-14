@@ -27,30 +27,39 @@ pub enum Tlv {
     EncryptionIv([u8; 16]),
     ProtectedStreamKey([u8; 32]),
     StreamStartBytes([u8; 32]),
-    InnerRandomStream(InnerRandomStreamType)
+    InnerRandomStream(InnerRandomStreamType),
 }
 
 pub struct HeaderReader<'a> {
     reader: &'a mut Read,
-    errored: bool
+    errored: bool,
 }
 
 pub fn tlvs<'a>(reader: &'a mut Read) -> HeaderReader<'a> {
-    HeaderReader { reader: reader, errored: false }
+    HeaderReader {
+        reader: reader,
+        errored: false,
+    }
 }
 
 impl <'a> Iterator for HeaderReader<'a> {
     type Item = Result<Tlv, Error>;
 
     fn next(&mut self) -> Option<Result<Tlv, Error>> {
-        if self.errored { None } else {
-            let result = read_type_length(self.reader)
-                .and_then(|(tlv_type, length)| read_tlv(self.reader, tlv_type, length));
+        if self.errored {
+            None
+        } else {
+            let result = read_type_length(self.reader).and_then(|(tlv_type, length)| {
+                read_tlv(self.reader, tlv_type, length)
+            });
 
             match result {
                 Ok(Tlv::EndOfHeader) => None,
                 Ok(_) => Some(result),
-                Err(_) => { self.errored = true; Some(result) }
+                Err(_) => {
+                    self.errored = true;
+                    Some(result)
+                }
             }
         }
     }
@@ -75,12 +84,16 @@ fn read_tlv(reader: &mut Read, tlv_type: u8, length: u16) -> Result<Tlv, Error> 
         8 => protected_stream_key::read_tlv(reader, length),
         9 => stream_start_bytes::read_tlv(reader, length),
         10 => inner_random_stream::read_tlv(reader, length),
-        _ => Err(Error::UnknownTlv(tlv_type))
+        _ => Err(Error::UnknownTlv(tlv_type)),
     }
 }
 
 fn check_tlv_length(length: u16, expected: u16) -> Result<(), Error> {
-    if length == expected { Ok(()) } else { Err(Error::InvalidTlvSize) }
+    if length == expected {
+        Ok(())
+    } else {
+        Err(Error::InvalidTlvSize)
+    }
 }
 
 #[cfg(test)]
@@ -125,12 +138,12 @@ mod test {
 
         match tlvs[0] {
             Ok(Tlv::Compression(CompressionType::Gzip)) => (),
-            _ => panic!("Invalid result: {:#?}", tlvs[0])
+            _ => panic!("Invalid result: {:#?}", tlvs[0]),
         }
 
         match tlvs[1] {
             Ok(Tlv::Cipher(CipherType::Aes)) => (),
-            _ => panic!("Invalid result: {:#?}", tlvs[0])
+            _ => panic!("Invalid result: {:#?}", tlvs[0]),
         }
     }
 }

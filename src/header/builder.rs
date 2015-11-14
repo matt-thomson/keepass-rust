@@ -13,7 +13,7 @@ pub struct HeaderBuilder {
     encryption_iv: Option<[u8; 16]>,
     protected_stream_key: Option<[u8; 32]>,
     stream_start_bytes: Option<[u8; 32]>,
-    inner_random_stream: Option<InnerRandomStreamType>
+    inner_random_stream: Option<InnerRandomStreamType>,
 }
 
 impl HeaderBuilder {
@@ -28,7 +28,7 @@ impl HeaderBuilder {
             encryption_iv: None,
             protected_stream_key: None,
             stream_start_bytes: None,
-            inner_random_stream: None
+            inner_random_stream: None,
         }
     }
 
@@ -43,21 +43,30 @@ impl HeaderBuilder {
             Tlv::EncryptionIv(iv) => self.encryption_iv = Some(iv),
             Tlv::ProtectedStreamKey(key) => self.protected_stream_key = Some(key),
             Tlv::StreamStartBytes(bytes) => self.stream_start_bytes = Some(bytes),
-            Tlv::InnerRandomStream(stream) => self.inner_random_stream = Some(stream)
+            Tlv::InnerRandomStream(stream) => self.inner_random_stream = Some(stream),
         }
     }
 
     pub fn build(self) -> Result<Header, Error> {
-        if self.cipher.is_none() { Err(Error::MissingCipherType) }
-        else if self.compression.is_none() { Err(Error::MissingCompressionType) }
-        else if self.master_seed.is_none() { Err(Error::MissingMasterSeed) }
-        else if self.transform_seed.is_none() { Err(Error::MissingTransformSeed) }
-        else if self.transform_rounds.is_none() { Err(Error::MissingTransformRounds) }
-        else if self.encryption_iv.is_none() { Err(Error::MissingEncryptionIv) }
-        else if self.protected_stream_key.is_none() { Err(Error::MissingProtectedStreamKey) }
-        else if self.stream_start_bytes.is_none() { Err(Error::MissingStreamStartBytes) }
-        else if self.inner_random_stream.is_none() { Err(Error::MissingInnerRandomStream) }
-        else {
+        if self.cipher.is_none() {
+            Err(Error::MissingCipherType)
+        } else if self.compression.is_none() {
+            Err(Error::MissingCompressionType)
+        } else if self.master_seed.is_none() {
+            Err(Error::MissingMasterSeed)
+        } else if self.transform_seed.is_none() {
+            Err(Error::MissingTransformSeed)
+        } else if self.transform_rounds.is_none() {
+            Err(Error::MissingTransformRounds)
+        } else if self.encryption_iv.is_none() {
+            Err(Error::MissingEncryptionIv)
+        } else if self.protected_stream_key.is_none() {
+            Err(Error::MissingProtectedStreamKey)
+        } else if self.stream_start_bytes.is_none() {
+            Err(Error::MissingStreamStartBytes)
+        } else if self.inner_random_stream.is_none() {
+            Err(Error::MissingInnerRandomStream)
+        } else {
             Ok(Header {
                 version: self.version,
                 cipher: self.cipher.unwrap(),
@@ -68,7 +77,7 @@ impl HeaderBuilder {
                 encryption_iv: self.encryption_iv.unwrap(),
                 protected_stream_key: self.protected_stream_key.unwrap(),
                 stream_start_bytes: self.stream_start_bytes.unwrap(),
-                inner_random_stream: self.inner_random_stream.unwrap()
+                inner_random_stream: self.inner_random_stream.unwrap(),
             })
         }
     }
@@ -126,7 +135,7 @@ mod test {
 
         match result {
             Err(Error::MissingCipherType) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -141,7 +150,7 @@ mod test {
 
         match result {
             Err(Error::MissingCompressionType) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -157,7 +166,7 @@ mod test {
 
         match result {
             Err(Error::MissingMasterSeed) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -175,7 +184,7 @@ mod test {
 
         match result {
             Err(Error::MissingTransformSeed) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -195,7 +204,7 @@ mod test {
 
         match result {
             Err(Error::MissingTransformRounds) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -217,7 +226,7 @@ mod test {
 
         match result {
             Err(Error::MissingEncryptionIv) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -241,7 +250,7 @@ mod test {
 
         match result {
             Err(Error::MissingProtectedStreamKey) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -267,7 +276,7 @@ mod test {
 
         match result {
             Err(Error::MissingStreamStartBytes) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -295,7 +304,7 @@ mod test {
 
         match result {
             Err(Error::MissingInnerRandomStream) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 }

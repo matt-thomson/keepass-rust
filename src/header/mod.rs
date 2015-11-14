@@ -11,20 +11,20 @@ use std::io::Read;
 
 #[derive(Debug, PartialEq)]
 enum CipherType {
-    Aes
+    Aes,
 }
 
 #[derive(Debug, PartialEq)]
 enum CompressionType {
     None,
-    Gzip
+    Gzip,
 }
 
 #[derive(Debug, PartialEq)]
 enum InnerRandomStreamType {
     None,
     Rc4,
-    Salsa20
+    Salsa20,
 }
 
 #[derive(Debug)]
@@ -38,12 +38,15 @@ pub struct Header {
     encryption_iv: [u8; 16],
     protected_stream_key: [u8; 32],
     stream_start_bytes: [u8; 32],
-    inner_random_stream: InnerRandomStreamType
+    inner_random_stream: InnerRandomStreamType,
 }
 
 impl Header {
     pub fn master_key(&self, passphrase: &str) -> Result<[u8; 32], Error> {
-        master_key::key(&self.transform_seed, self.transform_rounds, &self.master_seed, passphrase)
+        master_key::key(&self.transform_seed,
+                        self.transform_rounds,
+                        &self.master_seed,
+                        passphrase)
     }
 
     pub fn encryption_iv(&self) -> [u8; 16] {
@@ -65,7 +68,7 @@ pub fn read_header(file_type: FileType, reader: &mut Read) -> Result<Header, Err
 fn check_file_type(file_type: FileType) -> Result<(), Error> {
     match file_type {
         FileType::KeePass2 => Ok(()),
-        _ => Err(Error::UnsupportedFileType(file_type))
+        _ => Err(Error::UnsupportedFileType(file_type)),
     }
 }
 
@@ -79,7 +82,7 @@ fn handle_tlvs(reader: &mut Read, version: u32) -> Result<Header, Error> {
     for tlv in tlv::tlvs(reader) {
         match tlv {
             Ok(t) => builder.apply(t),
-            Err(e) => return Err(e)
+            Err(e) => return Err(e),
         }
     }
 
@@ -96,7 +99,7 @@ mod test {
 
         match result {
             Err(Error::UnsupportedFileType(FileType::KeePass1)) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 }

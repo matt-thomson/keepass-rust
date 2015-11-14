@@ -22,7 +22,7 @@ pub fn read_tlv(reader: &mut Read, length: u16) -> Result<Tlv, Error> {
 fn match_cipher_type(uuid1: u64, uuid2: u64) -> Result<CipherType, Error> {
     match (uuid1, uuid2) {
         (AES_UUID_1, AES_UUID_2) => Ok(CipherType::Aes),
-        _ => Err(Error::UnknownCipherType(uuid1, uuid2))
+        _ => Err(Error::UnknownCipherType(uuid1, uuid2)),
     }
 }
 
@@ -46,7 +46,7 @@ mod test {
 
         match result {
             Ok(Tlv::Cipher(CipherType::Aes)) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -58,7 +58,7 @@ mod test {
 
         match result {
             Err(Error::InvalidTlvSize) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -77,8 +77,8 @@ mod test {
             Err(Error::UnknownCipherType(u1, u2)) => {
                 assert_eq!(u1, uuid1);
                 assert_eq!(u2, uuid2);
-            },
-            _ => panic!("Invalid result: {:#?}", result)
+            }
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 }

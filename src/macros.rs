@@ -36,7 +36,7 @@ mod test {
 
         match result {
             Err(Error::UnexpectedEOF) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 }

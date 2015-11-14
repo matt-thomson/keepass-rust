@@ -27,7 +27,7 @@ mod test {
 
         match result {
             Ok(Tlv::EncryptionIv(iv)) => assert_eq!(iv, bytes),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -38,7 +38,7 @@ mod test {
 
         match result {
             Err(Error::InvalidTlvSize) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 }

@@ -19,7 +19,7 @@ fn match_compression_flags(flags: u32) -> Result<CompressionType, Error> {
     match flags {
         0 => Ok(CompressionType::None),
         1 => Ok(CompressionType::Gzip),
-        _ => Err(Error::UnknownCompressionType(flags))
+        _ => Err(Error::UnknownCompressionType(flags)),
     }
 }
 
@@ -42,7 +42,7 @@ mod test {
 
         match result {
             Ok(Tlv::Compression(CompressionType::Gzip)) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -54,7 +54,7 @@ mod test {
 
         match result {
             Err(Error::InvalidTlvSize) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -67,7 +67,7 @@ mod test {
 
         match result {
             Err(Error::UnknownCompressionType(2)) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 }

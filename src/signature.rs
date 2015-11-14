@@ -5,8 +5,8 @@ use std::io::Read;
 
 const SIGNATURE_FILE: u32 = 0x9AA2D903;
 const SIGNATURE_KEEPASS1: u32 = 0xB54BFB65;
-const SIGNATURE_KEEPASS2_PRE_RELEASE: u32  = 0xB54BFB66;
-const SIGNATURE_KEEPASS2: u32  = 0xB54BFB67;
+const SIGNATURE_KEEPASS2_PRE_RELEASE: u32 = 0xB54BFB66;
+const SIGNATURE_KEEPASS2: u32 = 0xB54BFB67;
 
 pub fn read_file_type(reader: &mut Read) -> Result<FileType, Error> {
     let signature = try!(bytes::read_u32(reader));
@@ -17,15 +17,19 @@ pub fn read_file_type(reader: &mut Read) -> Result<FileType, Error> {
 }
 
 fn check_file_signature(sig: u32) -> Result<(), Error> {
-    if sig == SIGNATURE_FILE { Ok(()) } else { Err(Error::InvalidSignature(sig)) }
+    if sig == SIGNATURE_FILE {
+        Ok(())
+    } else {
+        Err(Error::InvalidSignature(sig))
+    }
 }
 
 fn match_file_type(file_type: u32) -> Result<FileType, Error> {
     match file_type {
-            SIGNATURE_KEEPASS1 => Ok(FileType::KeePass1),
-            SIGNATURE_KEEPASS2_PRE_RELEASE => Ok(FileType::KeePass2PreRelease),
-            SIGNATURE_KEEPASS2 => Ok(FileType::KeePass2),
-            _ => Err(Error::InvalidFileType(file_type))
+        SIGNATURE_KEEPASS1 => Ok(FileType::KeePass1),
+        SIGNATURE_KEEPASS2_PRE_RELEASE => Ok(FileType::KeePass2PreRelease),
+        SIGNATURE_KEEPASS2 => Ok(FileType::KeePass2),
+        _ => Err(Error::InvalidFileType(file_type)),
     }
 }
 
@@ -46,7 +50,7 @@ mod test {
 
         match result {
             Ok(FileType::KeePass2) => (),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -61,7 +65,7 @@ mod test {
 
         match result {
             Err(Error::InvalidSignature(s)) => assert_eq!(s, signature),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 
@@ -77,7 +81,7 @@ mod test {
 
         match result {
             Err(Error::InvalidFileType(t)) => assert_eq!(t, file_type),
-            _ => panic!("Invalid result: {:#?}", result)
+            _ => panic!("Invalid result: {:#?}", result),
         }
     }
 }

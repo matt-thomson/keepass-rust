@@ -10,12 +10,16 @@ use Error;
 pub struct BlockReader<'a> {
     delegate: &'a mut Read,
     next_block_id: u32,
-    block: Cursor<Vec<u8>>
+    block: Cursor<Vec<u8>>,
 }
 
 impl <'a> BlockReader<'a> {
     pub fn new(delegate: &'a mut Read) -> BlockReader<'a> {
-        BlockReader { delegate: delegate, next_block_id: 0, block: Cursor::new(vec![]) }
+        BlockReader {
+            delegate: delegate,
+            next_block_id: 0,
+            block: Cursor::new(vec![]),
+        }
     }
 
     fn read_next_block(&mut self) -> Result<(), Error> {
@@ -29,7 +33,7 @@ impl <'a> BlockReader<'a> {
 
                 self.read_and_check_block(size as usize, &hash)
             }
-            Err(e) => Err(e)
+            Err(e) => Err(e),
         }
     }
 
@@ -50,7 +54,11 @@ impl <'a> BlockReader<'a> {
     }
 
     fn check_block_id(&self, block_id: u32) -> Result<(), Error> {
-        if self.next_block_id == block_id { Ok(()) } else { Err(Error::IncorrectBlockId) }
+        if self.next_block_id == block_id {
+            Ok(())
+        } else {
+            Err(Error::IncorrectBlockId)
+        }
     }
 }
 
@@ -78,5 +86,9 @@ fn check_block(block: &Vec<u8>, hash: &[u8; 32]) -> Result<(), Error> {
     let mut buf = [0; 32];
     hasher.result(&mut buf);
 
-    if buf == *hash { Ok(()) } else { Err(Error::IncorrectBlockHash) }
+    if buf == *hash {
+        Ok(())
+    } else {
+        Err(Error::IncorrectBlockHash)
+    }
 }
