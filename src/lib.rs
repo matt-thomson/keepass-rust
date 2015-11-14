@@ -5,6 +5,7 @@ extern crate xml;
 #[macro_use]mod macros;
 
 mod bytes;
+mod database;
 mod error;
 mod header;
 mod read;
@@ -13,6 +14,7 @@ mod signature;
 use std::fs::File;
 use std::path::Path;
 
+pub use database::Database;
 pub use error::Error;
 
 #[derive(Debug)]
