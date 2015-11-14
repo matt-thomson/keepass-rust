@@ -1,3 +1,4 @@
+sudo: false
 language: rust
 rust:
 - stable
@@ -9,9 +10,6 @@ after_success: |
   [ $TRAVIS_RUST_VERSION = stable ] &&
   cargo doc &&
   echo "<meta http-equiv=refresh content=0;url=keepass/index.html>" > target/doc/index.html &&
-  sudo pip install ghp-import &&
+  pip install ghp-import --user &&
   ghp-import -n target/doc &&
   git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages
-env:
-  global:
-    secure: ueWZoYHNmficGPMDmcERVtC3dcEjdJxPA4RPSknYGXMV9LJgvRRMAqa/9lG4uTb/mgIppALZTRF+F+6Tl8cxrySANSmClT11p9dZHI7fmlIE/eRqwviDHnYNOP7FCsWSQsFkjjzK4Q78h3cqsqjLuIaf7UjgsjPKNOrLmY2PIlg=
