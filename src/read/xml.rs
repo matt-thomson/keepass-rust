@@ -5,9 +5,9 @@ use std::io::Read;
 use xml::reader::EventReader;
 
 pub fn read(reader: &mut Read) -> Result<(), Error> {
-    let mut event_reader = EventReader::new(reader);
+    let event_reader = EventReader::new(reader);
 
-    for e in event_reader.events() {
+    for e in event_reader {
         println!("{:?}", e);
     }
 
