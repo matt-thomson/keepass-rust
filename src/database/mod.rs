@@ -29,14 +29,21 @@ mod tests {
     fn should_create_and_find_entry() {
         let mut database = Database::new();
 
-        database.add(DatabaseEntry::new("http://example.com/foo", "tom", "hunter1"));
-        database.add(DatabaseEntry::new("http://example.com/bar", "dick", "hunter2"));
-        database.add(DatabaseEntry::new("http://example.com/baz", "harry", "hunter3"));
+        database.add(DatabaseEntry::new("http://example.com/foo",
+                                        Some("tom".to_string()),
+                                        Some("hunter1".to_string())));
+        database.add(DatabaseEntry::new("http://example.com/bar",
+                                        Some("dick".to_string()),
+                                        Some("hunter2".to_string())));
+        database.add(DatabaseEntry::new("http://example.com/baz",
+                                        Some("harry".to_string()),
+                                        Some("hunter3".to_string())));
 
         let entry = database.find("http://example.com/bar");
         assert!(entry.is_some());
         assert_eq!(entry.unwrap().title(), "http://example.com/bar");
-        assert_eq!(entry.unwrap().username(), "dick");
-        assert_eq!(entry.unwrap().password(), "hunter2");
+
+        assert_eq!(entry.unwrap().username().as_ref().unwrap(), "dick");
+        assert_eq!(entry.unwrap().password().as_ref().unwrap(), "hunter2");
     }
 }

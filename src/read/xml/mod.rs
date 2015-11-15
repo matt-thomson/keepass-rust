@@ -73,7 +73,7 @@ mod tests {
         assert!(entry.is_some());
 
         assert_eq!(entry.unwrap().title(), "http://example.com");
-        assert_eq!(entry.unwrap().username(), "joe.bloggs");
-        assert_eq!(entry.unwrap().password(), "9crW5hp7SQ==");
+        assert_eq!(entry.unwrap().username().as_ref().unwrap(), "joe.bloggs");
+        assert_eq!(entry.unwrap().password().as_ref().unwrap(), "9crW5hp7SQ==");
     }
 }

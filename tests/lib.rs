@@ -6,11 +6,9 @@ fn should_read_database() {
     assert!(result.is_ok());
 
     let database = result.unwrap();
-    let entry = database.find("http://example.com");
+    let entry = database.find("http://example.com").unwrap();
 
-    assert!(entry.is_some());
-
-    assert_eq!(entry.unwrap().title(), "http://example.com");
-    assert_eq!(entry.unwrap().username(), "joe.bloggs");
-    assert_eq!(entry.unwrap().password(), "hunter2");
+    assert_eq!(entry.title(), "http://example.com");
+    assert_eq!(entry.username().as_ref().unwrap(), "joe.bloggs");
+    assert_eq!(entry.password().as_ref().unwrap(), "hunter2");
 }

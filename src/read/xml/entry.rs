@@ -36,8 +36,8 @@ pub fn read(iterator: &mut Iterator<Item = Result<XmlEvent, Error>>,
     }
 
     Ok(DatabaseEntry::new(&try!(title.ok_or(Error::MissingTitle))[..],
-                          &try!(username.ok_or(Error::MissingUsername))[..],
-                          &try!(password.ok_or(Error::MissingPassword))[..]))
+                          username,
+                          password))
 }
 
 #[cfg(test)]
@@ -59,8 +59,12 @@ mod tests {
         let entry = super::read(&mut iterator, &mut *protected).unwrap();
 
         assert_eq!(entry.title(), "http://example.com");
-        assert_eq!(entry.username(), "joe.bloggs");
-        assert_eq!(entry.password(), "9crW5hp7SQ==");
+
+        assert!(entry.username().is_some());
+        assert_eq!(entry.username().as_ref().unwrap(), "joe.bloggs");
+
+        assert!(entry.password().is_some());
+        assert_eq!(entry.password().as_ref().unwrap(), "9crW5hp7SQ==");
     }
 
     #[test]
@@ -78,30 +82,15 @@ mod tests {
     }
 
     #[test]
-    fn should_return_error_on_missing_username() {
-        let file = File::open("data/xml/entry/no_username.xml").unwrap();
+    fn should_handle_missing_username_and_password() {
+        let file = File::open("data/xml/entry/no_credentials.xml").unwrap();
         let event_reader = EventReader::new(file);
         let mut iterator = event_reader.into_iter().map(|result| result.map_err(|e| Error::Xml(e)));
         let mut protected = ProtectedStream::none();
-        let result = super::read(&mut iterator, &mut *protected);
+        let entry = super::read(&mut iterator, &mut *protected).unwrap();
 
-        match result {
-            Err(Error::MissingUsername) => (),
-            _ => panic!("Invalid result: {:#?}", result),
-        }
-    }
-
-    #[test]
-    fn should_return_error_on_missing_password() {
-        let file = File::open("data/xml/entry/no_password.xml").unwrap();
-        let event_reader = EventReader::new(file);
-        let mut iterator = event_reader.into_iter().map(|result| result.map_err(|e| Error::Xml(e)));
-        let mut protected = ProtectedStream::none();
-        let result = super::read(&mut iterator, &mut *protected);
-
-        match result {
-            Err(Error::MissingPassword) => (),
-            _ => panic!("Invalid result: {:#?}", result),
-        }
+        assert_eq!(entry.title(), "http://example.com");
+        assert!(entry.username().is_none());
+        assert!(entry.password().is_none());
     }
 }
