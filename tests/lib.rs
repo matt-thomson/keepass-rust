@@ -12,5 +12,5 @@ fn should_read_database() {
 
     assert_eq!(entry.unwrap().title(), "http://example.com");
     assert_eq!(entry.unwrap().username(), "joe.bloggs");
-    assert_eq!(entry.unwrap().password(), "9crW5hp7SQ==");
+    assert_eq!(entry.unwrap().password(), "hunter2");
 }

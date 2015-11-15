@@ -22,9 +22,8 @@ pub fn decrypt(decryptor: &mut Decryptor, value: &[u8]) -> Result<Vec<u8>, Error
     let mut write_buffer = RefWriteBuffer::new(&mut buffer);
 
     loop {
-        let result = try!(decryptor
-                              .decrypt(&mut read_buffer, &mut write_buffer, true)
-                              .map_err(|e| Error::Cipher(e)));
+        let result = try!(decryptor.decrypt(&mut read_buffer, &mut write_buffer, true)
+                                   .map_err(|e| Error::Cipher(e)));
         final_result.extend(write_buffer.take_read_buffer()
                                         .take_remaining()
                                         .iter()

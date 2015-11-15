@@ -60,9 +60,9 @@ impl Header {
 
     pub fn protected_stream(&self) -> Box<ProtectedStream> {
         match self.inner_random_stream {
-            InnerRandomStreamType::None    => ProtectedStream::none(),
-            InnerRandomStreamType::Rc4     => ProtectedStream::rc4(&self.protected_stream_key),
-            InnerRandomStreamType::Salsa20 => ProtectedStream::salsa20(&self.protected_stream_key)
+            InnerRandomStreamType::None => ProtectedStream::none(),
+            InnerRandomStreamType::Rc4 => ProtectedStream::rc4(&self.protected_stream_key),
+            InnerRandomStreamType::Salsa20 => ProtectedStream::salsa20(&self.protected_stream_key),
         }
     }
 }
