@@ -33,9 +33,5 @@ pub fn read<P: AsRef<Path>>(path: P, passphrase: &str) -> Result<Database, Error
     let file_type = try!(signature::read_file_type(&mut file));
     let header = try!(header::read_header(file_type, &mut file));
 
-    let master_key = try!(header.master_key(passphrase));
-    read::read(&master_key,
-               &header.encryption_iv(),
-               &header.stream_start_bytes(),
-               &mut file)
+    read::read(&mut file, &header, passphrase)
 }
