@@ -17,3 +17,21 @@
 		<Value>joe.bloggs</Value>
 	</String>
 </Entry>
+<Entry>
+	<String>
+		<Key>Password</Key>
+		<Value />
+	</String>
+	<String>
+		<Key>Title</Key>
+		<Value />
+	</String>
+	<String>
+		<Key>URL</Key>
+		<Value />
+	</String>
+	<String>
+		<Key>UserName</Key>
+		<Value />
+	</String>
+</Entry>

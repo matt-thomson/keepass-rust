@@ -23,6 +23,11 @@ pub fn read(iterator: &mut Iterator<Item = Result<XmlEvent, Error>>,
                     }
                 }
             }
+            Some(Ok(XmlEvent::EndElement { name, .. })) => {
+                if name.local_name == "Entry" {
+                    break;
+                }
+            }
 
             Some(Err(e)) => return Err(e),
             None => break,
