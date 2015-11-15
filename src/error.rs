@@ -4,8 +4,10 @@ use std;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::io::Error as IoError;
+use std::string::FromUtf8Error;
 
 use crypto::symmetriccipher::SymmetricCipherError;
+use rustc_serialize::base64::FromBase64Error;
 use xml::reader::Error as XmlError;
 
 #[derive(Debug)]
@@ -45,6 +47,9 @@ pub enum Error {
     MissingTitle,
     MissingUsername,
     MissingPassword,
+
+    Base64(FromBase64Error),
+    Utf8(FromUtf8Error),
 }
 
 impl std::error::Error for Error {

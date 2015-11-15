@@ -1,11 +1,11 @@
 use Error;
 
+use util::sha256;
+
 use crypto::aes;
 use crypto::aes::KeySize;
 use crypto::blockmodes::NoPadding;
 use crypto::buffer::{ReadBuffer, RefReadBuffer, RefWriteBuffer, WriteBuffer};
-use crypto::digest::Digest;
-use crypto::sha2::Sha256;
 use crypto::symmetriccipher::Encryptor;
 
 use std::io::Read;
@@ -19,24 +19,8 @@ pub fn key(transform_seed: &[u8; 32],
     Ok(make_master_key(&key, &master_seed))
 }
 
-fn sha256(input: &[u8]) -> [u8; 32] {
-    let mut hasher = Sha256::new();
-    hasher.input(input);
-
-    let mut buf = [0; 32];
-    hasher.result(&mut buf);
-
-    buf
-}
-
 fn composite_key(passphrase: &str) -> [u8; 32] {
-    let mut hasher1 = Sha256::new();
-    hasher1.input_str(passphrase);
-
-    let mut buf1 = [0; 32];
-    hasher1.result(&mut buf1);
-
-    sha256(&buf1)
+    sha256(&sha256(&passphrase.as_bytes()))
 }
 
 fn transform_key(key: &[u8; 32], seed: &[u8; 32], rounds: u64) -> Result<[u8; 32], Error> {

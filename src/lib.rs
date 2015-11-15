@@ -1,5 +1,6 @@
 extern crate byteorder;
 extern crate crypto;
+extern crate rustc_serialize;
 extern crate xml;
 
 #[macro_use]mod macros;
@@ -8,8 +9,10 @@ mod bytes;
 mod database;
 mod error;
 mod header;
+mod protected;
 mod read;
 mod signature;
+mod util;
 
 use std::fs::File;
 use std::path::Path;
