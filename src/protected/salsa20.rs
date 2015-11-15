@@ -8,7 +8,7 @@ use rustc_serialize::base64::FromBase64;
 
 const IV: [u8; 8] = [0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A];
 
-struct Salsa20 {
+pub struct Salsa20 {
     decryptor: SalsaDecryptor,
 }
 
