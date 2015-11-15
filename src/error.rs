@@ -44,9 +44,6 @@ pub enum Error {
     Xml(XmlError),
 
     MissingKey,
-    MissingTitle,
-    MissingUsername,
-    MissingPassword,
 
     Base64(FromBase64Error),
     Utf8(FromUtf8Error),

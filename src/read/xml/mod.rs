@@ -72,7 +72,7 @@ mod tests {
         let entry = database.find("http://example.com");
         assert!(entry.is_some());
 
-        assert_eq!(entry.unwrap().title(), "http://example.com");
+        assert_eq!(entry.unwrap().title().as_ref().unwrap(), "http://example.com");
         assert_eq!(entry.unwrap().username().as_ref().unwrap(), "joe.bloggs");
         assert_eq!(entry.unwrap().password().as_ref().unwrap(), "9crW5hp7SQ==");
     }

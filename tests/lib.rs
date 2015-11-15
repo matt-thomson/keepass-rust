@@ -8,7 +8,7 @@ fn should_read_database() {
     let database = result.unwrap();
     let entry = database.find("http://example.com").unwrap();
 
-    assert_eq!(entry.title(), "http://example.com");
+    assert_eq!(entry.title().as_ref().unwrap(), "http://example.com");
     assert_eq!(entry.username().as_ref().unwrap(), "joe.bloggs");
     assert_eq!(entry.password().as_ref().unwrap(), "hunter2");
 }

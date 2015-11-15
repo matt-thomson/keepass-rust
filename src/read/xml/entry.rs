@@ -35,9 +35,7 @@ pub fn read(iterator: &mut Iterator<Item = Result<XmlEvent, Error>>,
         }
     }
 
-    Ok(DatabaseEntry::new(&try!(title.ok_or(Error::MissingTitle))[..],
-                          username,
-                          password))
+    Ok(DatabaseEntry::new(title, username, password))
 }
 
 #[cfg(test)]
@@ -58,7 +56,8 @@ mod tests {
         let mut protected = ProtectedStream::none();
         let entry = super::read(&mut iterator, &mut *protected).unwrap();
 
-        assert_eq!(entry.title(), "http://example.com");
+        assert!(entry.title().is_some());
+        assert_eq!(entry.title().as_ref().unwrap(), "http://example.com");
 
         assert!(entry.username().is_some());
         assert_eq!(entry.username().as_ref().unwrap(), "joe.bloggs");
@@ -68,28 +67,14 @@ mod tests {
     }
 
     #[test]
-    fn should_return_error_on_missing_title() {
-        let file = File::open("data/xml/entry/no_title.xml").unwrap();
-        let event_reader = EventReader::new(file);
-        let mut iterator = event_reader.into_iter().map(|result| result.map_err(|e| Error::Xml(e)));
-        let mut protected = ProtectedStream::none();
-        let result = super::read(&mut iterator, &mut *protected);
-
-        match result {
-            Err(Error::MissingTitle) => (),
-            _ => panic!("Invalid result: {:#?}", result),
-        }
-    }
-
-    #[test]
-    fn should_handle_missing_username_and_password() {
-        let file = File::open("data/xml/entry/no_credentials.xml").unwrap();
+    fn should_handle_missing_values() {
+        let file = File::open("data/xml/entry/no_values.xml").unwrap();
         let event_reader = EventReader::new(file);
         let mut iterator = event_reader.into_iter().map(|result| result.map_err(|e| Error::Xml(e)));
         let mut protected = ProtectedStream::none();
         let entry = super::read(&mut iterator, &mut *protected).unwrap();
 
-        assert_eq!(entry.title(), "http://example.com");
+        assert!(entry.title().is_none());
         assert!(entry.username().is_none());
         assert!(entry.password().is_none());
     }

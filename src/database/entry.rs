@@ -1,20 +1,23 @@
 #[derive(Debug)]
 pub struct DatabaseEntry {
-    title: String,
+    title: Option<String>,
     username: Option<String>,
     password: Option<String>,
 }
 
 impl DatabaseEntry {
-    pub fn new(title: &str, username: Option<String>, password: Option<String>) -> DatabaseEntry {
+    pub fn new(title: Option<String>,
+               username: Option<String>,
+               password: Option<String>)
+               -> DatabaseEntry {
         DatabaseEntry {
-            title: title.to_string(),
+            title: title,
             username: username,
             password: password,
         }
     }
 
-    pub fn title(&self) -> &str {
+    pub fn title(&self) -> &Option<String> {
         &self.title
     }
 
@@ -25,6 +28,13 @@ impl DatabaseEntry {
     pub fn password(&self) -> &Option<String> {
         &self.password
     }
+
+    pub fn matches_title(&self, title: &str) -> bool {
+        match self.title {
+            Some(ref t) => title == t,
+            None => false,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -33,10 +43,12 @@ mod tests {
 
     #[test]
     fn should_create_entry() {
-        let entry = DatabaseEntry::new("http://example.com",
+        let entry = DatabaseEntry::new(Some("http://example.com".to_string()),
                                        Some("bob".to_string()),
                                        Some("hunter2".to_string()));
-        assert_eq!(entry.title(), "http://example.com");
+
+        assert!(entry.title().is_some());
+        assert_eq!(entry.title().as_ref().unwrap(), "http://example.com");
 
         assert!(entry.username().is_some());
         assert_eq!(entry.username().as_ref().unwrap(), "bob");
