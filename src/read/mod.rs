@@ -16,8 +16,9 @@ pub fn read(reader: &mut Read, header: &Header, passphrase: &str) -> Result<Data
     let result = try!(read_array!(&mut stream, 32));
     try!(check_key(&result, &header.stream_start_bytes()));
 
-    let mut block_reader = BlockReader::new(&mut stream);
-    xml::read(&mut block_reader, &mut *header.protected_stream())
+    let block_reader = BlockReader::new(Box::new(stream));
+    let mut decompressed = try!(header.decompress(Box::new(block_reader)));
+    xml::read(&mut decompressed, &mut *header.protected_stream())
 }
 
 fn check_key(result: &[u8; 32], expected: &[u8; 32]) -> Result<(), Error> {

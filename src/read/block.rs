@@ -7,14 +7,14 @@ use std::io::{Cursor, Read};
 use bytes;
 use Error;
 
-pub struct BlockReader<'a> {
-    delegate: &'a mut Read,
+pub struct BlockReader {
+    delegate: Box<Read>,
     next_block_id: u32,
     block: Cursor<Vec<u8>>,
 }
 
-impl <'a> BlockReader<'a> {
-    pub fn new(delegate: &'a mut Read) -> BlockReader<'a> {
+impl BlockReader {
+    pub fn new(delegate: Box<Read>) -> BlockReader {
         BlockReader {
             delegate: delegate,
             next_block_id: 0,
@@ -23,13 +23,13 @@ impl <'a> BlockReader<'a> {
     }
 
     fn read_next_block(&mut self) -> Result<(), Error> {
-        let block_id = bytes::read_u32(self.delegate);
+        let block_id = bytes::read_u32(&mut self.delegate);
         match block_id {
             Ok(id) => {
                 try!(self.check_block_id(id));
 
-                let hash = try!(read_array!(self.delegate, 32));
-                let size = try!(bytes::read_u32(self.delegate));
+                let hash = try!(read_array!(&mut self.delegate, 32));
+                let size = try!(bytes::read_u32(&mut self.delegate));
 
                 self.read_and_check_block(size as usize, &hash)
             }
@@ -62,7 +62,7 @@ impl <'a> BlockReader<'a> {
     }
 }
 
-impl <'a> Read for BlockReader<'a> {
+impl  Read for BlockReader {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         let result = try!(self.block().read(buf));
 

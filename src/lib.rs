@@ -1,5 +1,6 @@
 extern crate byteorder;
 extern crate crypto;
+extern crate flate2;
 extern crate rustc_serialize;
 extern crate xml;
 
@@ -7,6 +8,7 @@ extern crate xml;
 
 mod bytes;
 mod database;
+mod decompress;
 mod error;
 mod header;
 mod protected;

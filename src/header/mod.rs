@@ -3,6 +3,7 @@ mod master_key;
 mod tlv;
 
 use bytes;
+use decompress;
 use {Error, FileType};
 
 use self::builder::HeaderBuilder;
@@ -56,6 +57,13 @@ impl Header {
 
     pub fn stream_start_bytes(&self) -> [u8; 32] {
         self.stream_start_bytes
+    }
+
+    pub fn decompress(&self, read: Box<Read>) -> Result<Box<Read>, Error> {
+        match self.compression {
+            CompressionType::None => decompress::none(read),
+            CompressionType::Gzip => decompress::gzip(read),
+        }
     }
 
     pub fn protected_stream(&self) -> Box<ProtectedStream> {
