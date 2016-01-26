@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Error",""],["FileType",""]],"fn":[["read",""]],"struct":[["Database",""],["DatabaseEntry",""]]});
